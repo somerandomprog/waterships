@@ -1,11 +1,14 @@
 package by.bsu.waterships.client;
 
+import by.bsu.waterships.client.runnables.Client;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class HelloApplication extends Application {
     @Override
@@ -17,7 +20,8 @@ public class HelloApplication extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnknownHostException {
+        Client.getInstance(InetAddress.getLocalHost().getHostAddress()).start();
         launch();
     }
 }

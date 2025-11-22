@@ -1,0 +1,27 @@
+#bg {
+    -fx-background-image: url(../textures/bg.png);
+    -fx-background-size: 1280 720;
+}
+
+#play, #about {
+    -fx-background-size: contain;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-color: transparent;
+}
+
+#play {
+    -fx-background-image: url(../textures/buttons/play.png);
+}
+
+#play:hover {
+    -fx-background-image: url(../textures/buttons/play_hover.png);
+}
+
+#about {
+    -fx-background-image: url(../textures/buttons/about.png);
+}
+
+#about:hover {
+    -fx-background-image: url(../textures/buttons/about_hover.png);
+}

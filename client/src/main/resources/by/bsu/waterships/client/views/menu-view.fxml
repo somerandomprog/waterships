@@ -1,10 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox id="bg" alignment="CENTER" prefHeight="720.0" prefWidth="1280.0" spacing="20.0" stylesheets="@../stylesheets/bg.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.MenuController">
+<VBox id="bg" alignment="CENTER" prefHeight="720.0" prefWidth="1280.0" spacing="20.0" stylesheets="@../stylesheets/menu.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.MenuController">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        <Insets left="160.0" />
     </padding>
+   <children>
+      <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+         <children>
+            <Pane VBox.vgrow="ALWAYS">
+               <children>
+                  <Text fill="#234bb4" layoutX="242.0" layoutY="287.0" strokeType="OUTSIDE" strokeWidth="0.0" text="морские кораблики">
+                     <font>
+                        <Font name="Bristol" size="80.0" />
+                     </font>
+                  </Text>
+                  <Button id="play" layoutX="271.0" layoutY="364.0" onAction="#onPlayPressed" mnemonicParsing="false" prefHeight="130.0" prefWidth="260.0" rotate="2.0" />
+                  <Button id="about" layoutX="589.0" layoutY="364.0" onAction="#onAboutPressed" mnemonicParsing="false" prefHeight="130.0" prefWidth="260.0" rotate="-2.0" />
+                  <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="888.0" layoutY="132.0" pickOnBounds="true" preserveRatio="true" rotate="135.0">
+                     <image>
+                        <Image url="@../textures/scribbles/056.png" />
+                     </image>
+                     <effect>
+                        <Blend mode="SRC_ATOP">
+                           <topInput>
+                              <ColorInput height="255.0" paint="#234bb4" width="255.0" />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="651.0" fitWidth="151.0" layoutX="-120.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../textures/scribbles/005.png" />
+                     </image>
+                     <effect>
+                        <Blend mode="SRC_ATOP">
+                           <topInput>
+                              <ColorInput height="1000.0" paint="#244cb2" width="255.0" />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                  </ImageView>
+                  <ImageView blendMode="SRC_ATOP" fitHeight="104.0" fitWidth="310.0" layoutX="177.0" layoutY="513.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../textures/scribbles/108.png" />
+                     </image>
+                     <effect>
+                        <Blend mode="SRC_ATOP">
+                           <topInput>
+                              <ColorInput height="255.0" paint="#234bb4" width="400.0" />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="151.0" fitWidth="199.0" layoutX="103.0" layoutY="68.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../textures/scribbles/450.png" />
+                     </image>
+                     <effect>
+                        <Blend mode="SRC_ATOP">
+                           <topInput>
+                              <ColorInput height="255.0" paint="#234bb4" width="400.0" />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="831.0" layoutY="478.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../textures/bad_mark.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+         </children>
+      </VBox>
+   </children>
 </VBox>

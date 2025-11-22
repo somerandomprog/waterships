@@ -1,0 +1,19 @@
+#bg {
+    -fx-background-image: url(../textures/bg.png);
+    -fx-background-size: 1280 720;
+}
+
+#back {
+    -fx-background-size: contain;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-color: transparent;
+}
+
+#back {
+    -fx-background-image: url(../textures/buttons/back.png);
+}
+
+#back:hover {
+    -fx-background-image: url(../textures/buttons/back_hover.png);
+}

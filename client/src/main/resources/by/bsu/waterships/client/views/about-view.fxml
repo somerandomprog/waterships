@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.effect.ColorInput?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox id="bg" alignment="CENTER" prefHeight="720.0" prefWidth="1280.0" spacing="20.0" stylesheets="@../stylesheets/about.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.AboutController">
+   <padding>
+      <Insets left="160.0" />
+   </padding>
+   <children>
+      <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+         <children>
+            <Pane VBox.vgrow="ALWAYS">
+               <children>
+                  <Text fill="#234bb4" layoutX="452.0" layoutY="111.0" strokeType="OUTSIDE" strokeWidth="0.0" text="авторы">
+                     <font>
+                        <Font name="Bristol" size="80.0" />
+                     </font>
+                  </Text>
+                  <Button id="back" layoutX="460.0" layoutY="578.0" mnemonicParsing="false" onAction="#onBackPressed" prefHeight="95.0" prefWidth="200.0" rotate="2.0" />
+                  <ImageView fitHeight="651.0" fitWidth="151.0" layoutX="-120.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../textures/scribbles/005.png" />
+                     </image>
+                     <effect>
+                        <Blend mode="SRC_ATOP">
+                           <topInput>
+                              <ColorInput height="1000.0" paint="#244cb2" width="255.0" />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                  </ImageView>
+                  <VBox layoutX="285.0" layoutY="169.0" prefHeight="200.0" prefWidth="510.0" spacing="10.0">
+                     <children>
+                        <ImageView fitHeight="334.0" fitWidth="550.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/authors.png" />
+                           </image>
+                        </ImageView>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Text fill="#234bb4" strokeType="OUTSIDE" strokeWidth="0.0" text=" Будник Михаил">
+                                 <font>
+                                    <Font name="Klyakson" size="32.0" />
+                                 </font>
+                              </Text>
+                              <Separator opacity="0.0" prefWidth="200.0" />
+                              <Text fill="#234bb4" layoutX="10.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Микова Дарья   ">
+                                 <font>
+                                    <Font name="Klyakson" size="32.0" />
+                                 </font>
+                              </Text>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </Pane>
+         </children>
+      </VBox>
+   </children>
+</VBox>

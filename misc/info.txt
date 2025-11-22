@@ -1,0 +1,3 @@
+blue - #234bb4
+blue hover - #2387b4
+red - #ef5d60

@@ -25,24 +25,31 @@ public class Client extends Thread {
     private static Client instance;
 
     private ClientListener listener;
-    private final String host;
+    private String host;
     private boolean connected;
 
     private Socket socket;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
 
-    private Client(String host) {
-        this.host = host;
+    private Client() {
     }
 
     public void setListener(ClientListener listener) {
         this.listener = listener;
     }
 
-    public static Client getInstance(String host) {
-        if (instance == null || !instance.host.equals(host)) instance = new Client(host);
+    public static Client getInstance() {
+        if (instance == null) instance = new Client();
         return instance;
+    }
+
+    public Client configure(String newHost) {
+        if (host == null || !host.equals(newHost)) {
+            cleanup();
+            host = newHost;
+        }
+        return this;
     }
 
     @Override
@@ -70,7 +77,24 @@ public class Client extends Thread {
         attempt(() -> {
             oos.writeObject(new DisconnectMessage());
             connected = false;
+            cleanup();
         });
+    }
+
+    private void cleanup() {
+        try {
+            if (oos != null) oos.close();
+            if (ois != null) ois.close();
+            if (socket != null && !socket.isClosed()) socket.close();
+
+            oos = null;
+            ois = null;
+            socket = null;
+            listener = null;
+        } catch (Exception e) {
+            System.err.println("failed to cleanup Client");
+            e.printStackTrace(System.err);
+        }
     }
 
     public MessageResult sendMessage(Message message) {

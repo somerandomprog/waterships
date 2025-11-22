@@ -19,18 +19,22 @@ public class ClientHandler extends Thread {
     }
 
     private final Socket socket;
-    private final ClientHandlerListener listener;
-    private final PlayerIndex index;
+    private ClientHandlerListener listener;
     private int retryAttempts = Constants.KEEPALIVE_RETRY_ATTEMPTS;
 
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
 
-    public ClientHandler(Socket socket, PlayerIndex index, ClientHandlerListener listener) {
+    public PlayerIndex index;
+
+    public ClientHandler(Socket socket, PlayerIndex index) {
         this.socket = socket;
         this.index = index;
-        this.listener = listener;
         setDaemon(true);
+    }
+
+    public void setListener(ClientHandlerListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -57,7 +61,8 @@ public class ClientHandler extends Thread {
 
                 retryAttempts = Constants.KEEPALIVE_RETRY_ATTEMPTS;
                 socket.setSoTimeout(Constants.KEEPALIVE_SOCKET_TIMEOUT);
-                if (handleMessage(message)) break;
+                boolean shouldDisconnect = handleMessage(message);
+                if (shouldDisconnect) break;
             }
         } catch (Exception e) {
             System.err.println("something went wrong while talking to client at " + socket.getInetAddress().getHostAddress() + ": " + e.getMessage());
@@ -80,6 +85,7 @@ public class ClientHandler extends Thread {
     private boolean handleMessage(Message message) {
         assert message != null;
         printMessage(message, false);
+
         if (message.getCode() == MessageCode.DISCONNECT) return true;
         try {
             switch (message.getCode()) {

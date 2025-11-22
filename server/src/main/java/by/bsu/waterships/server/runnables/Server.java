@@ -35,10 +35,15 @@ public class Server implements Runnable {
                     continue;
                 }
 
-                int index = handlers.isEmpty() ? 0 : 1;
                 ClientHandler handler = new ClientHandler(socket,
-                        handlers.isEmpty() ? PlayerIndex.PLAYER_1 : PlayerIndex.PLAYER_2,
-                        () -> handlers.remove(index));
+                        handlers.isEmpty() ? PlayerIndex.PLAYER_1 : PlayerIndex.PLAYER_2);
+                handler.setListener(() -> {
+                    if(handler.index == PlayerIndex.PLAYER_1 && handlers.size() == Constants.MAX_SOCKETS) {
+                        System.out.println("reassigning sockets. socket [2] is now [1]");
+                        handlers.get(1).index = PlayerIndex.PLAYER_1;
+                    }
+                    handlers.remove(handler.index.ordinal());
+                });
                 handler.start();
                 handlers.add(handler);
                 System.out.println("accepted connection from " + socket.getInetAddress().getHostAddress() + "!");

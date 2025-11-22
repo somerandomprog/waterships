@@ -1,0 +1,4 @@
+#bg {
+    -fx-background-image: url(../textures/bg.png);
+    -fx-background-size: 1280 720;
+}

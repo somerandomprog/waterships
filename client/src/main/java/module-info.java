@@ -5,4 +5,6 @@ module by.bsu.waterships.client {
 
     opens by.bsu.waterships.client to javafx.fxml;
     exports by.bsu.waterships.client;
+    exports by.bsu.waterships.client.controllers;
+    opens by.bsu.waterships.client.controllers to javafx.fxml;
 }

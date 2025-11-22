@@ -66,7 +66,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>by.bsu.waterships.client/by.bsu.waterships.client.HelloApplication</mainClass>
+                            <mainClass>by.bsu.waterships.client/by.bsu.waterships.client.WatershipsApplication</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>

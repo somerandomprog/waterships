@@ -1,0 +1,9 @@
+TextField {
+    -fx-background-image: url(../textures/input/base.png);
+    -fx-background-size: contain;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-color: transparent;
+    -fx-text-fill: #234bb4;
+    -fx-prompt-text-fill: #2387b4;
+}

@@ -1,7 +1,6 @@
 package by.bsu.waterships.client;
 
 import by.bsu.waterships.client.controllers.SceneController;
-import by.bsu.waterships.client.runnables.Client;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -9,8 +8,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 public class WatershipsApplication extends Application {
 
@@ -22,6 +19,9 @@ public class WatershipsApplication extends Application {
         SceneController controller = SceneController.getInstance(stage);
         controller.add(SceneController.MENU_SCENE, "views/menu-view.fxml");
         controller.add(SceneController.ABOUT_SCENE, "views/about-view.fxml");
+        controller.add(SceneController.CONNECT_TO_SERVER_SCENE, "views/connect-to-server-view.fxml");
+        controller.add(SceneController.WAIT_SCENE, "views/wait-view.fxml");
+        controller.add(SceneController.INTRODUCE_SCENE, "views/introduce-view.fxml");
 
         stage.setResizable(false);
         stage.setTitle("waterships");
@@ -31,8 +31,7 @@ public class WatershipsApplication extends Application {
         controller.activate(SceneController.MENU_SCENE);
     }
 
-    public static void main(String[] args) throws UnknownHostException {
-        Client.getInstance().configure(InetAddress.getLocalHost().getHostAddress()).start();
+    public static void main(String[] args) {
         launch();
     }
 }

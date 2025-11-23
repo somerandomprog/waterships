@@ -5,7 +5,7 @@ import javafx.fxml.FXML;
 public class MenuController {
     @FXML
     public void onPlayPressed() {
-
+        SceneController.getInstance().activate(SceneController.CONNECT_TO_SERVER_SCENE);
     }
 
     @FXML

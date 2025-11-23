@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.effect.ColorInput?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox id="bg" alignment="CENTER" prefHeight="720.0" prefWidth="1280.0" spacing="20.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.IntroduceController">
+   <padding>
+      <Insets left="160.0" />
+   </padding>
+   <children>
+      <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+         <children>
+            <Pane prefHeight="720.0">
+               <children>
+                  <ImageView fx:id="timer" fitHeight="651.0" fitWidth="151.0" layoutX="-120.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../textures/scribbles/005.png" />
+                     </image>
+                     <effect>
+                        <Blend mode="SRC_ATOP">
+                           <topInput>
+                              <ColorInput height="1000.0" paint="#244cb2" width="255.0" />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                  </ImageView>
+                  <Label layoutX="413.0" layoutY="14.0" text="представьтесь!" textFill="#234bb4">
+                     <font>
+                        <Font name="Bristol" size="48.0" />
+                     </font>
+                  </Label>
+                  <Pane layoutX="579.0" layoutY="144.0" prefHeight="433.0" prefWidth="433.0" styleClass="canvas-container">
+                     <children>
+                        <Canvas fx:id="canvas" height="360.0" layoutX="37.0" layoutY="37.0" width="360.0" />
+                     </children>
+                     <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </padding>
+                     <effect>
+                        <Blend mode="SRC_ATOP">
+                           <topInput>
+                              <ColorInput height="500.0" paint="#234bb4" width="500.0" />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                  </Pane>
+                  <TextField id="ip" fx:id="nameField" layoutX="586.0" layoutY="606.0" prefHeight="70.0" prefWidth="420.0" promptText="как вас звать?" rotate="1.0">
+                     <font>
+                        <Font name="Klyakson" size="36.0" />
+                     </font>
+                  </TextField>
+                  <Label alignment="CENTER" layoutX="530.0" layoutY="96.0" prefHeight="46.0" prefWidth="532.0" rotate="-1.0" text="нарисуйте что-нибудь!" textAlignment="CENTER" textFill="#234bb4">
+                     <font>
+                        <Font name="Klyakson" size="30.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" layoutX="14.0" layoutY="101.0" prefHeight="46.0" prefWidth="532.0" rotate="1.0" text="ваш соперник" textAlignment="CENTER" textFill="#234bb4">
+                     <font>
+                        <Font name="Klyakson" size="30.0" />
+                     </font>
+                  </Label>
+                  <ImageView fx:id="opponentImageView" fitHeight="360.0" fitWidth="360.0" layoutX="100.0" layoutY="181.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label fx:id="opponentName" alignment="CENTER" layoutX="14.0" layoutY="554.0" prefHeight="46.0" prefWidth="532.0" rotate="-1.0" textAlignment="CENTER" textFill="#234bb4">
+                     <font>
+                        <Font name="Klyakson" size="30.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+         </children>
+      </VBox>
+   </children>
+   <stylesheets>
+      <URL value="@../stylesheets/global.css" />
+      <URL value="@../stylesheets/introduce.css" />
+      <URL value="@../stylesheets/input.css" />
+   </stylesheets>
+</VBox>

@@ -1,0 +1,19 @@
+#connect {
+    -fx-background-image: url(../textures/buttons/connect.png);
+}
+
+#connect:hover {
+    -fx-background-image: url(../textures/buttons/connect_hover.png);
+}
+
+#connect.s1 {
+    -fx-background-image: url(../textures/buttons/connect_1.png);
+}
+
+#connect.s2 {
+    -fx-background-image: url(../textures/buttons/connect_2.png);
+}
+
+#connect.s3 {
+    -fx-background-image: url(../textures/buttons/connect_3.png);
+}

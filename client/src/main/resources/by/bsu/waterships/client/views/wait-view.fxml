@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox id="bg" alignment="CENTER" prefHeight="720.0" prefWidth="1280.0" spacing="20.0" stylesheets="@../stylesheets/global.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.WaitController">
+   <padding>
+      <Insets left="160.0" />
+   </padding>
+   <children>
+      <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+         <children>
+            <Label fx:id="statusLabel" text="секундочку..." textFill="#234bb4">
+               <font>
+                  <Font name="Klyakson" size="48.0" />
+               </font>
+            </Label>
+            <Label fx:id="firstPlayerLabel" alignment="CENTER" text="вы первый игрок!&#10;ждём вашего соперника...&#10;" textAlignment="CENTER" textFill="#234bb4">
+               <font>
+                  <Font name="Klyakson" size="48.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+   </children>
+</VBox>

@@ -1,10 +1,9 @@
 package by.bsu.waterships.server.runnables;
 
 import by.bsu.waterships.shared.Constants;
-import by.bsu.waterships.shared.messages.PingMessageResult;
+import by.bsu.waterships.shared.messages.*;
 import by.bsu.waterships.shared.types.Message;
 import by.bsu.waterships.shared.types.MessageCode;
-import by.bsu.waterships.shared.types.MessageResult;
 import by.bsu.waterships.shared.types.PlayerIndex;
 import by.bsu.waterships.shared.utils.ThrowableUtils;
 
@@ -12,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ClientHandler extends Thread {
     interface ClientHandlerListener {
@@ -43,24 +43,24 @@ public class ClientHandler extends Thread {
         try {
             oos = new ObjectOutputStream(socket.getOutputStream());
             ois = new ObjectInputStream(socket.getInputStream());
-            socket.setSoTimeout(Constants.KEEPALIVE_SOCKET_TIMEOUT);
+            socket.setSoTimeout(Constants.KEEPALIVE_DELAY);
 
             while (true) {
                 Message message = ThrowableUtils.nullIfThrows(() -> (Message) ois.readObject());
                 if (message == null) {
                     try {
-                        socket.getOutputStream().write(0);
-                    } catch (Exception e) {
+                        send(new PingMessage());
                         retryAttempts--;
-                        socket.setSoTimeout(Constants.KEEPALIVE_SOCKET_TIMEOUT * (Constants.KEEPALIVE_RETRY_ATTEMPTS - retryAttempts));
-                        System.out.printf("[%d] seems to be disconnected, %d attempt(s) remaining. new timeout: %d ms\n", index.ordinal() + 1, retryAttempts, socket.getSoTimeout());
+                        socket.setSoTimeout(Constants.KEEPALIVE_DELAY * (Constants.KEEPALIVE_RETRY_ATTEMPTS - retryAttempts));
+                        if (retryAttempts < Constants.KEEPALIVE_RETRY_ATTEMPTS - 1)
+                            System.out.printf("[%d] seems to be disconnected, %d attempt(s) remaining. new timeout: %d ms\n", index.ordinal() + 1, retryAttempts, socket.getSoTimeout());
                         if (retryAttempts == 0) break;
+                        continue;
+                    } catch (Exception e) {
+                        break;
                     }
-                    continue;
                 }
 
-                retryAttempts = Constants.KEEPALIVE_RETRY_ATTEMPTS;
-                socket.setSoTimeout(Constants.KEEPALIVE_SOCKET_TIMEOUT);
                 boolean shouldDisconnect = handleMessage(message);
                 if (shouldDisconnect) break;
             }
@@ -77,9 +77,9 @@ public class ClientHandler extends Thread {
         System.out.printf("%s %s: %s\n", prefix, message.getCode().name(), message);
     }
 
-    private void respond(MessageResult result) throws IOException {
-        printMessage(result, true);
-        oos.writeObject(result);
+    public void send(Message message) throws IOException {
+        printMessage(message, true);
+        oos.writeObject(message);
     }
 
     private boolean handleMessage(Message message) {
@@ -87,10 +87,36 @@ public class ClientHandler extends Thread {
         printMessage(message, false);
 
         if (message.getCode() == MessageCode.DISCONNECT) return true;
+        else if (message.getCode() == MessageCode.RESULT) {
+            switch (message) {
+                case PingMessageResult pmr: {
+                    retryAttempts = Constants.KEEPALIVE_RETRY_ATTEMPTS;
+                    try {
+                        socket.setSoTimeout(Constants.KEEPALIVE_DELAY);
+                    } catch (SocketException ignored) {
+                    }
+                    return false;
+                }
+                case SubmitIntroductionProgressMessageResult sipmr: {
+                    try {
+                        Server.getInstance().getSocket(index == PlayerIndex.PLAYER_1 ? PlayerIndex.PLAYER_2 : PlayerIndex.PLAYER_1).send(new UpdateOpponentIntroductionMessage(sipmr.info));
+                    } catch (IOException ignored) {
+                    }
+                    return false;
+                }
+                default:
+                    return false;
+            }
+        }
+
         try {
             switch (message.getCode()) {
                 case PING: {
-                    respond(new PingMessageResult());
+                    send(message.respond(new PingMessageResult()));
+                    break;
+                }
+                case GET_PLAYER_INDEX: {
+                    send(message.respond(new GetPlayerIndexMessageResult(index)));
                     break;
                 }
             }
@@ -108,14 +134,14 @@ public class ClientHandler extends Thread {
             if (oos != null) oos.close();
             if (ois != null) ois.close();
             socket.close();
-            listener.onDisconnected();
             System.out.println("disconnected client at " + socket.getInetAddress().getHostAddress());
         } catch (Exception e) {
             System.err.println("failed to disconnect client at " + socket.getInetAddress().getHostAddress());
             e.printStackTrace(System.err);
         } finally {
-            interrupt();
             disconnected = true;
+            listener.onDisconnected();
+            interrupt();
         }
     }
 }

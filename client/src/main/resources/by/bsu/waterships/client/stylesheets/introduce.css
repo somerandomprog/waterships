@@ -1,0 +1,7 @@
+.canvas-container {
+    -fx-background-image: url(../textures/scribbles/059.png);
+    -fx-background-size: contain;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-color: transparent;
+}

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox id="bg" alignment="CENTER" prefHeight="720.0" prefWidth="1280.0" spacing="20.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.ConnectToServerController">
+   <padding>
+      <Insets left="160.0" />
+   </padding>
+   <children>
+      <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+         <children>
+            <Pane VBox.vgrow="ALWAYS">
+               <children>
+                  <Button id="back" layoutX="-150.0" layoutY="640.0" mnemonicParsing="false" onAction="#onBackPressed" prefHeight="60.0" prefWidth="130.0" rotate="-5.0" />
+                  <Text fill="#234bb4" layoutX="390.0" layoutY="181.0" strokeType="OUTSIDE" strokeWidth="0.0" text="новая игра">
+                     <font>
+                        <Font name="Bristol" size="80.0" />
+                     </font>
+                  </Text>
+                  <Button id="connect" fx:id="connectButton" layoutX="400.0" layoutY="434.0" mnemonicParsing="false" onAction="#onConnectPressed" prefHeight="100.0" prefWidth="320.0" rotate="-2.0" />
+                  <TextField id="ip" fx:id="ipField" layoutX="294.0" layoutY="316.0" prefHeight="89.0" prefWidth="532.0" promptText="введите IP адрес сервера">
+                     <font>
+                        <Font name="Klyakson" size="36.0" />
+                     </font>
+                  </TextField>
+                  <Label fx:id="errorLabel" alignment="CENTER" layoutX="144.0" layoutY="606.0" prefHeight="30.0" prefWidth="832.0" textAlignment="CENTER" textFill="#ef5d60">
+                     <font>
+                        <Font name="Klyakson" size="36.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="errorLabel1" alignment="CENTER" layoutX="294.0" layoutY="250.0" prefHeight="46.0" prefWidth="532.0" text="ip адрес сервера" textAlignment="CENTER" textFill="#234bb4">
+                     <font>
+                        <Font name="Klyakson" size="36.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+         </children>
+      </VBox>
+   </children>
+   <stylesheets>
+      <URL value="@../stylesheets/connect.css" />
+      <URL value="@../stylesheets/global.css" />
+      <URL value="@../stylesheets/input.css" />
+   </stylesheets>
+</VBox>

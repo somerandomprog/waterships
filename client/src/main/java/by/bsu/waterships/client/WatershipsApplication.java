@@ -1,6 +1,7 @@
 package by.bsu.waterships.client;
 
 import by.bsu.waterships.client.controllers.SceneController;
+import by.bsu.waterships.client.state.Resources;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -22,6 +23,7 @@ public class WatershipsApplication extends Application {
         controller.add(SceneController.CONNECT_TO_SERVER_SCENE, "views/connect-to-server-view.fxml");
         controller.add(SceneController.WAIT_SCENE, "views/wait-view.fxml");
         controller.add(SceneController.INTRODUCE_SCENE, "views/introduce-view.fxml");
+        controller.add(SceneController.ASSEMBLE_BOARD_SCENE, "views/assemble-board-view.fxml");
 
         stage.setResizable(false);
         stage.setTitle("waterships");

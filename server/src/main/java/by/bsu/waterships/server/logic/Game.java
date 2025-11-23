@@ -2,6 +2,7 @@ package by.bsu.waterships.server.logic;
 
 import by.bsu.waterships.server.runnables.Server;
 import by.bsu.waterships.shared.Constants;
+import by.bsu.waterships.shared.messages.EndIntroductionMessage;
 import by.bsu.waterships.shared.messages.SubmitIntroductionProgressMessage;
 
 public class Game {
@@ -16,16 +17,28 @@ public class Game {
         switch (state) {
             case INTRODUCTION: {
                 introductionPollingThread = new Thread(() -> {
+                    int total = 0;
                     while (!Thread.currentThread().isInterrupted()) {
                         try {
                             Thread.sleep(Constants.INTRODUCTION_REQUEST_DELAY);
-                            Server.getInstance().broadcast(new SubmitIntroductionProgressMessage());
+                            total += Constants.INTRODUCTION_REQUEST_DELAY;
+                            if (total >= Constants.INTRODUCTION_DURATION_SECONDS * 1000) {
+                                Server.getInstance().broadcast(new EndIntroductionMessage());
+                                setState(GameState.ASSEMBLE_BOARD);
+                            } else Server.getInstance().broadcast(new SubmitIntroductionProgressMessage());
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
                     }
                 });
                 introductionPollingThread.start();
+                break;
+            }
+            case ASSEMBLE_BOARD: {
+                introductionPollingThread.interrupt();
+                introductionPollingThread = null;
+
+                System.out.println("assembling board");
                 break;
             }
         }

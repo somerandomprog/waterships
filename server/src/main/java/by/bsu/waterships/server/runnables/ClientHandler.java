@@ -2,6 +2,12 @@ package by.bsu.waterships.server.runnables;
 
 import by.bsu.waterships.shared.Constants;
 import by.bsu.waterships.shared.messages.*;
+import by.bsu.waterships.shared.messages.assembly.AssemblyPlacedShipMessage;
+import by.bsu.waterships.shared.messages.assembly.AssemblyReadyMessage;
+import by.bsu.waterships.shared.messages.assembly.AssemblyUpdateOpponentMessage;
+import by.bsu.waterships.shared.messages.introduction.IntroductionSubmitProgressMessageResult;
+import by.bsu.waterships.shared.messages.introduction.IntroductionUpdateOpponentMessage;
+import by.bsu.waterships.shared.types.Board;
 import by.bsu.waterships.shared.types.Message;
 import by.bsu.waterships.shared.types.MessageCode;
 import by.bsu.waterships.shared.types.PlayerIndex;
@@ -14,7 +20,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public class ClientHandler extends Thread {
-    interface ClientHandlerListener {
+    public interface ClientHandlerListener {
         void onDisconnected();
     }
 
@@ -97,9 +103,9 @@ public class ClientHandler extends Thread {
                     }
                     return false;
                 }
-                case SubmitIntroductionProgressMessageResult sipmr: {
+                case IntroductionSubmitProgressMessageResult sipmr: {
                     try {
-                        Server.getInstance().getSocket(index == PlayerIndex.PLAYER_1 ? PlayerIndex.PLAYER_2 : PlayerIndex.PLAYER_1).send(new UpdateOpponentIntroductionMessage(sipmr.info));
+                        getOpponentHandler().send(new IntroductionUpdateOpponentMessage(sipmr.info));
                     } catch (IOException ignored) {
                     }
                     return false;
@@ -117,6 +123,24 @@ public class ClientHandler extends Thread {
                 }
                 case GET_PLAYER_INDEX: {
                     send(message.respond(new GetPlayerIndexMessageResult(index)));
+                    break;
+                }
+
+                // assembly
+                case ASSEMBLY_PLACE_SHIP: {
+                    int total = ((AssemblyPlacedShipMessage) message).total;
+                    getOpponentHandler().send(new AssemblyUpdateOpponentMessage(total));
+                    break;
+                }
+                case ASSEMBLY_READY: {
+                    Board board = ((AssemblyReadyMessage) message).board;
+                    Server.getInstance().getCurrentSession().playerAssembledBoard(index, board);
+                    break;
+                }
+
+                // game
+                case GAME_READY: {
+                    Server.getInstance().getCurrentSession().playerReady(index);
                     break;
                 }
             }
@@ -143,5 +167,9 @@ public class ClientHandler extends Thread {
             listener.onDisconnected();
             interrupt();
         }
+    }
+
+    private ClientHandler getOpponentHandler() {
+        return Server.getInstance().getSocket(index == PlayerIndex.PLAYER_1 ? PlayerIndex.PLAYER_2 : PlayerIndex.PLAYER_1);
     }
 }

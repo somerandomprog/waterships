@@ -27,7 +27,7 @@ public class WaitController {
 
     public void switched() {
         listener = message -> {
-            if (message.getCode() == MessageCode.START_INTRODUCTION)
+            if (message.getCode() == MessageCode.INTRODUCTION_START)
                 Platform.runLater(() -> SceneController.getInstance().activate(SceneController.INTRODUCE_SCENE));
         };
         Client.getInstance().addCommandListener(listener);
@@ -35,7 +35,6 @@ public class WaitController {
         receivePlayerIndexThread = new Thread(() -> {
             try {
                 MessageResult result = Client.getInstance().sendMessage(new GetPlayerIndexMessage());
-                System.out.println(result);
                 if (result instanceof GetPlayerIndexMessageResult playerIndexMessageResult) {
                     if (playerIndexMessageResult.index == PlayerIndex.PLAYER_1) Platform.runLater(() -> {
                         statusLabel.setManaged(false);

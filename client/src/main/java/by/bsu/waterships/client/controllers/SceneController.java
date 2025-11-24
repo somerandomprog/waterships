@@ -16,7 +16,7 @@ public class SceneController {
     public static final String WAIT_SCENE = "wait";
     public static final String INTRODUCE_SCENE = "introduce";
     public static final String ASSEMBLE_BOARD_SCENE = "assemble_board";
-    public static final String PLAY_SCENE = "play";
+    public static final String GAME_SCENE = "game";
     public static final String END_SCENE = "end";
 
     private static SceneController instance;

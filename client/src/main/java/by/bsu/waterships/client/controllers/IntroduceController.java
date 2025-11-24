@@ -3,8 +3,8 @@ package by.bsu.waterships.client.controllers;
 import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.shared.Constants;
-import by.bsu.waterships.shared.messages.SubmitIntroductionProgressMessageResult;
-import by.bsu.waterships.shared.messages.UpdateOpponentIntroductionMessage;
+import by.bsu.waterships.shared.messages.introduction.IntroductionSubmitProgressMessageResult;
+import by.bsu.waterships.shared.messages.introduction.IntroductionUpdateOpponentMessage;
 import by.bsu.waterships.shared.types.MessageCode;
 import by.bsu.waterships.shared.types.PlayerInfo;
 import javafx.animation.AnimationTimer;
@@ -52,7 +52,7 @@ public class IntroduceController {
     private GraphicsContext gc;
     private Client.ClientCommandListener listener;
 
-    private static final Color DRAW_COLOR = Color.web("#234bb4");
+    private static final Color DRAW_COLOR = Color.BLACK;
     private static final double DRAW_LINE_WIDTH = 5;
     private static final int NAME_FIELD_MAX_LENGTH = 20;
 
@@ -69,7 +69,7 @@ public class IntroduceController {
 
     public void switched() {
         listener = message -> {
-            if (message.getCode() == MessageCode.SUBMIT_INTRODUCTION_PROGRESS) {
+            if (message.getCode() == MessageCode.INTRODUCTION_SUBMIT_PROGRESS) {
                 Platform.runLater(() -> {
                     try {
                         SnapshotParameters sp = new SnapshotParameters();
@@ -79,7 +79,7 @@ public class IntroduceController {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         ImageIO.write(rimage, "png", baos);
                         Client.getInstance().sendMessageWithoutResponse(
-                                new SubmitIntroductionProgressMessageResult(
+                                new IntroductionSubmitProgressMessageResult(
                                         new PlayerInfo(baos.toByteArray(), nameField.getText())
                                 )
                         );
@@ -87,19 +87,19 @@ public class IntroduceController {
                     } catch (Exception ignored) {
                     }
                 });
-            } else if (message.getCode() == MessageCode.UPDATE_OPPONENT_INTRODUCTION) {
-                UpdateOpponentIntroductionMessage uoim = (UpdateOpponentIntroductionMessage) message;
+            } else if (message.getCode() == MessageCode.INTRODUCTION_UPDATE_OPPONENT) {
+                IntroductionUpdateOpponentMessage uoim = (IntroductionUpdateOpponentMessage) message;
                 Platform.runLater(() -> {
-                    opponentImageView.setImage(new Image(new ByteArrayInputStream((uoim.info.image))));
-                    opponentName.setText(uoim.info.name);
+                    opponentImageView.setImage(new Image(new ByteArrayInputStream((uoim.info.image()))));
+                    opponentName.setText(uoim.info.name());
                 });
-            } else if (message.getCode() == MessageCode.END_INTRODUCTION) {
+            } else if (message.getCode() == MessageCode.INTRODUCTION_END) {
                 GameState state = GameState.getInstance();
                 state.meName = nameField.getText();
                 state.meImage = _lastRenderedImage;
                 state.opponentName = opponentName.getText();
                 state.opponentImage = opponentImageView.getImage();
-                SceneController.getInstance().activate(SceneController.ASSEMBLE_BOARD_SCENE);
+                Platform.runLater(() -> SceneController.getInstance().activate(SceneController.ASSEMBLE_BOARD_SCENE));
             }
         };
         Client.getInstance().addCommandListener(listener);

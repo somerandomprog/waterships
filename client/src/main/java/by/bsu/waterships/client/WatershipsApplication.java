@@ -4,6 +4,7 @@ import by.bsu.waterships.client.controllers.SceneController;
 import by.bsu.waterships.client.state.Resources;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -24,10 +25,12 @@ public class WatershipsApplication extends Application {
         controller.add(SceneController.WAIT_SCENE, "views/wait-view.fxml");
         controller.add(SceneController.INTRODUCE_SCENE, "views/introduce-view.fxml");
         controller.add(SceneController.ASSEMBLE_BOARD_SCENE, "views/assemble-board-view.fxml");
+        controller.add(SceneController.GAME_SCENE, "views/game-view.fxml");
 
+        Scene scene = new Scene(new Pane(), 1280, 720);
         stage.setResizable(false);
         stage.setTitle("waterships");
-        stage.setScene(new Scene(new Pane(), 1280, 720));
+        stage.setScene(scene);
         stage.show();
 
         controller.activate(SceneController.MENU_SCENE);

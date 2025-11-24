@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.effect.Blend?>
-<?import javafx.scene.effect.ColorInput?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox id="bg" alignment="CENTER" prefHeight="720.0" prefWidth="1280.0" spacing="20.0" stylesheets="@../stylesheets/global.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.AssembleBoardController">
+<VBox id="bg" alignment="CENTER" prefHeight="720.0" prefWidth="1280.0" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.AssembleBoardController">
     <padding>
         <Insets left="160.0" />
     </padding>
@@ -22,19 +22,66 @@
             <children>
                 <Pane prefHeight="720.0">
                     <children>
-                  <ImageView fx:id="timer" fitHeight="651.0" fitWidth="151.0" layoutX="-120.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="405.0" fitWidth="400.0" layoutX="580.0" layoutY="69.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../textures/scribbles/005.png" />
+                        <Image url="@../textures/board/grid.png" />
                      </image>
-                     <effect>
-                        <Blend mode="SRC_ATOP">
-                           <topInput>
-                              <ColorInput height="1000.0" paint="#244cb2" width="255.0" />
-                           </topInput>
-                        </Blend>
-                     </effect>
                   </ImageView>
-                        <GridPane fx:id="boardGrid" layoutX="615.0" layoutY="216.0" prefHeight="360.0" prefWidth="360.0">
+                  <Pane fx:id="shipsContainer" layoutX="148.0" layoutY="149.0">
+                     <children>
+                        <ImageView fx:id="ship4" fitHeight="27.0" fitWidth="136.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/ship_4.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="ship3_1" fitHeight="26.0" fitWidth="105.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/ship_3.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="ship3_2" fitHeight="26.0" fitWidth="105.0" layoutX="143.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/ship_3.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="ship2_1" fitHeight="24.0" fitWidth="70.0" layoutY="146.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/ship_2.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="ship2_2" fitHeight="24.0" fitWidth="70.0" layoutX="108.0" layoutY="146.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/ship_2.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="ship2_3" fitHeight="24.0" fitWidth="70.0" layoutX="213.0" layoutY="146.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/ship_2.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="ship1_1" fitHeight="29.0" fitWidth="29.0" layoutY="216.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/ship_1.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="ship1_2" fitHeight="29.0" fitWidth="29.0" layoutX="70.0" layoutY="216.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/ship_1.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="ship1_3" fitHeight="29.0" fitWidth="29.0" layoutX="143.0" layoutY="216.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/ship_1.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="ship1_4" fitHeight="29.0" fitWidth="29.0" layoutX="215.0" layoutY="216.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/ship_1.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </Pane>
+                        <GridPane fx:id="boardGrid" layoutX="615.0" layoutY="109.0" prefHeight="360.0" prefWidth="360.0">
                             <columnConstraints>
                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
@@ -60,64 +107,21 @@
                                 <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
                             </rowConstraints>
                         </GridPane>
-                  <ImageView fitHeight="405.0" fitWidth="400.0" layoutX="580.0" layoutY="176.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="232.0" fitWidth="929.0" layoutX="-134.0" layoutY="488.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../textures/board/grid.png" />
+                        <Image url="@../textures/board/note.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="ship4" fitHeight="27.0" fitWidth="136.0" layoutX="153.0" layoutY="256.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../textures/board/ship_4.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="ship3_1" fitHeight="26.0" fitWidth="105.0" layoutX="153.0" layoutY="328.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../textures/board/ship_3.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="ship3_2" fitHeight="26.0" fitWidth="105.0" layoutX="296.0" layoutY="328.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../textures/board/ship_3.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="ship2_1" fitHeight="24.0" fitWidth="70.0" layoutX="153.0" layoutY="402.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../textures/board/ship_2.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="ship2_2" fitHeight="24.0" fitWidth="70.0" layoutX="261.0" layoutY="402.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../textures/board/ship_2.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="ship2_3" fitHeight="24.0" fitWidth="70.0" layoutX="366.0" layoutY="402.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../textures/board/ship_2.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="ship1_1" fitHeight="29.0" fitWidth="29.0" layoutX="153.0" layoutY="472.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../textures/board/ship_1.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="ship1_2" fitHeight="29.0" fitWidth="29.0" layoutX="223.0" layoutY="472.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../textures/board/ship_1.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="ship1_3" fitHeight="29.0" fitWidth="29.0" layoutX="296.0" layoutY="472.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../textures/board/ship_1.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="ship1_4" fitHeight="29.0" fitWidth="29.0" layoutX="368.0" layoutY="472.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../textures/board/ship_1.png" />
-                     </image>
-                  </ImageView>
-                  <Label layoutX="373.0" layoutY="14.0" text="разместите корабли!" textFill="#234bb4">
+                  <Button id="letsgo" fx:id="letsgo" disable="true" layoutX="849.0" layoutY="584.0" mnemonicParsing="false" onAction="#onReadyPressed" prefHeight="100.0" prefWidth="200.0" rotate="-2.0" />
+                  <Label fx:id="opponentProgress" layoutX="639.0" layoutY="631.0" rotate="2.0" text="0/10">
                      <font>
-                        <Font name="Bristol" size="48.0" />
+                        <Font name="Klyakson" size="36.0" />
+                     </font>
+                  </Label>
+                  <ImageView fx:id="opponentImage" fitHeight="100.0" fitWidth="100.0" layoutX="446.0" layoutY="563.0" pickOnBounds="true" preserveRatio="true" rotate="2.0" />
+                  <Label fx:id="opponentName" alignment="CENTER" layoutX="421.0" layoutY="672.0" maxWidth="150.0" prefWidth="150.0" rotate="2.0" textAlignment="CENTER">
+                     <font>
+                        <Font name="Klyakson" size="24.0" />
                      </font>
                   </Label>
                     </children>
@@ -125,4 +129,8 @@
             </children>
         </VBox>
     </children>
+   <stylesheets>
+      <URL value="@../stylesheets/global.css" />
+      <URL value="@../stylesheets/assemble.css" />
+   </stylesheets>
 </VBox>

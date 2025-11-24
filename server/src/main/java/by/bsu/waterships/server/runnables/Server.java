@@ -3,13 +3,13 @@ package by.bsu.waterships.server.runnables;
 import by.bsu.waterships.server.logic.Game;
 import by.bsu.waterships.server.logic.GameState;
 import by.bsu.waterships.shared.Constants;
-import by.bsu.waterships.shared.messages.StartIntroductionMessage;
+import by.bsu.waterships.shared.messages.introduction.IntroductionStartMessage;
 import by.bsu.waterships.shared.types.Message;
 import by.bsu.waterships.shared.types.PlayerIndex;
-import by.bsu.waterships.shared.types.PlayerInfo;
 import by.bsu.waterships.shared.utils.ThrowableUtils;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -33,9 +33,9 @@ public class Server implements Runnable {
             serverSocket.setSoTimeout(Constants.ACCEPT_SOCKET_TIMEOUT);
 
             System.out.println("server started listening on port " + Constants.PORT);
-            while (true) {
-                if (shouldStop) break;
+            System.out.println("local address: " + InetAddress.getLocalHost().getHostAddress());
 
+            while (!shouldStop) {
                 Socket socket = ThrowableUtils.nullIfThrows(() -> serverSocket.accept());
                 if (socket == null) continue;
                 if (handlers.size() >= Constants.MAX_SOCKETS) {
@@ -72,7 +72,7 @@ public class Server implements Runnable {
                 if (handlers.size() == 2) {
                     System.out.println("beginning introduction");
                     currentSession.setState(GameState.INTRODUCTION);
-                    broadcast(new StartIntroductionMessage(Constants.INTRODUCTION_DURATION_SECONDS));
+                    broadcast(new IntroductionStartMessage(Constants.INTRODUCTION_DURATION_SECONDS));
                 }
             }
         } catch (Exception e) {
@@ -102,5 +102,9 @@ public class Server implements Runnable {
     public static synchronized Server getInstance() {
         if (instance == null) instance = new Server();
         return instance;
+    }
+
+    public Game getCurrentSession() {
+        return currentSession;
     }
 }

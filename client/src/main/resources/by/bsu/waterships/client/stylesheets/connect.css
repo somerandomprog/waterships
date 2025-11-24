@@ -17,3 +17,11 @@
 #connect.s3 {
     -fx-background-image: url(../textures/buttons/connect_3.png);
 }
+
+#back {
+    -fx-background-image: url(../textures/buttons/back.png);
+}
+
+#back:hover {
+    -fx-background-image: url(../textures/buttons/back_hover.png);
+}

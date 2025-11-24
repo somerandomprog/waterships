@@ -1,0 +1,15 @@
+#letsgo {
+    -fx-background-image: url(../textures/buttons/letsgo.png);
+}
+
+#letsgo:disabled {
+    -fx-opacity: 0.5;
+}
+
+#letsgo:hover {
+    -fx-background-image: url(../textures/buttons/letsgo_hover.png);
+}
+
+#letsgo.waiting {
+    -fx-background-image: url(../textures/buttons/waiting.png);
+}

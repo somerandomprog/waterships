@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox id="bg" alignment="CENTER" prefHeight="720.0" prefWidth="1280.0" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.GameController">
+   <padding>
+      <Insets left="160.0" />
+   </padding>
+   <children>
+      <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+         <children>
+            <Pane prefHeight="720.0">
+               <children>
+                  <Pane fx:id="opponentContainer" layoutX="110.0" layoutY="35.0">
+                     <children>
+                        <ImageView fitHeight="405.0" fitWidth="400.0" layoutY="70.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/grid.png" />
+                           </image>
+                        </ImageView>
+                        <GridPane fx:id="opponentGrid" layoutX="35.0" layoutY="110.0" prefHeight="360.0" prefWidth="360.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                        </GridPane>
+                        <ImageView fx:id="opponentImage" fitHeight="50.0" fitWidth="50.0" layoutX="56.8802490234375" layoutY="499.135009765625" pickOnBounds="true" preserveRatio="true" rotate="1.0" />
+                        <Label fx:id="opponentName" layoutX="132.5772705078125" layoutY="505.85107421875" prefHeight="31.0" prefWidth="238.0" rotate="1.0">
+                           <font>
+                              <Font name="Klyakson" size="24.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="100.0" text="доска соперника" textFill="#234bb4">
+                           <font>
+                              <Font name="Klyakson" size="32.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </Pane>
+                  <Pane layoutX="614.0" layoutY="35.0">
+                     <children>
+                        <ImageView fitHeight="405.0" fitWidth="400.0" layoutY="70.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../textures/board/grid.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="shipsSnapshot" fitHeight="360.0" fitWidth="360.0" layoutX="35.0" layoutY="110.0" pickOnBounds="true" preserveRatio="true" />
+                        <GridPane fx:id="meGrid" layoutX="35.0" layoutY="110.0" prefHeight="360.0" prefWidth="360.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="35.25" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.25" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                        </GridPane>
+                        <Label layoutX="129.0" text="ваша доска" textFill="#234bb4">
+                           <font>
+                              <Font name="Klyakson" size="32.0" />
+                           </font>
+                        </Label>
+                        <ImageView fx:id="meImage" fitHeight="50.0" fitWidth="50.0" layoutX="63.0" layoutY="499.0" pickOnBounds="true" preserveRatio="true" />
+                        <Label fx:id="meName" layoutX="139.0" layoutY="507.0" prefHeight="31.0" prefWidth="238.0">
+                           <font>
+                              <Font name="Klyakson" size="24.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </Pane>
+               </children>
+            </Pane>
+         </children>
+      </VBox>
+   </children>
+   <stylesheets>
+      <URL value="@../stylesheets/global.css" />
+      <URL value="@../stylesheets/assemble.css" />
+   </stylesheets>
+</VBox>

@@ -13,7 +13,7 @@ public record Point(int x, int y) implements Serializable {
         List<Point> result = new ArrayList<>();
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
-                if(dx == 0 && dy == 0) continue;
+                if (dx == 0 && dy == 0) continue;
                 Point np = new Point(x + dx, y + dy);
                 if (np.isValid()) result.add(np);
             }

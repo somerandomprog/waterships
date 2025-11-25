@@ -2,14 +2,14 @@ package by.bsu.waterships.client.controllers;
 
 import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.GameState;
-import by.bsu.waterships.shared.messages.GetPlayerIndexMessage;
-import by.bsu.waterships.shared.messages.GetPlayerIndexMessageResult;
+import by.bsu.waterships.client.state.Resources;
 import by.bsu.waterships.shared.messages.assembly.AssemblyPlacedShipMessage;
 import by.bsu.waterships.shared.messages.assembly.AssemblyReadyMessage;
 import by.bsu.waterships.shared.messages.assembly.AssemblyUpdateOpponentMessage;
 import by.bsu.waterships.shared.types.Board;
 import by.bsu.waterships.shared.types.MessageCode;
 import by.bsu.waterships.shared.types.Point;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -24,9 +24,12 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static by.bsu.waterships.shared.utils.NullUtils.coalesce;
 
@@ -43,6 +46,8 @@ public class AssembleBoardController {
     public ImageView opponentImage;
     @FXML
     public Label opponentName;
+    @FXML
+    public Button randomizeButton;
 
     @FXML
     public ImageView ship4;
@@ -82,14 +87,16 @@ public class AssembleBoardController {
             int col = coalesce(GridPane.getColumnIndex(ship), 0);
             int row = coalesce(GridPane.getRowIndex(ship), 0);
             int length = (int) ship.getUserData();
+            int index = allShips.indexOf(ship);
             boolean isVertical = ship.getRotate() != 0;
-            board.addShip(new Point(col, row), length, isVertical);
+            board.addShip(new Board.Ship(index, new Point(col, row), length, isVertical));
         }
         Client.getInstance().sendMessageWithoutResponse(new AssemblyReadyMessage(board));
     }
 
     private List<ImageView> allShips;
     private Client.ClientCommandListener commandListener;
+    private final ConcurrentHashMap<ImageView, Pair<Double, Double>> originalLocations = new ConcurrentHashMap<>();
 
     @FXML
     public void initialize() {
@@ -112,8 +119,23 @@ public class AssembleBoardController {
     }
 
     public void switched() {
+        Resources.SFX.PAPER_SFX.play();
+
+        if (shipsContainer.getChildren().isEmpty()) {
+            for (ImageView ship : allShips) {
+                boardGrid.getChildren().remove(ship);
+                ship.setLayoutX(originalLocations.get(ship).getKey());
+                ship.setLayoutY(originalLocations.get(ship).getValue());
+                ship.setX(0); ship.setY(0); ship.setRotate(0); ship.setTranslateX(0);
+                shipsContainer.getChildren().add(ship);
+            }
+        }
+
         ready = false;
         letsgo.setDisable(true);
+        letsgo.getStyleClass().clear();
+        randomizeButton.setManaged(true);
+        randomizeButton.setVisible(true);
         opponentProgress.setText("0/10");
         opponentName.setText(GameState.getInstance().opponentName);
         opponentImage.setImage(GameState.getInstance().opponentImage);
@@ -132,14 +154,6 @@ public class AssembleBoardController {
             }
         };
         Client.getInstance().addCommandListener(commandListener);
-
-        try {
-            // we may have been interrupted on the wait screen so it's better to
-            // fetch it again just in case
-            GameState.getInstance().index = ((GetPlayerIndexMessageResult) Client.getInstance().sendMessage(new GetPlayerIndexMessage())).index;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void switchedAway() {
@@ -147,6 +161,7 @@ public class AssembleBoardController {
     }
 
     private void setupShip(ImageView ship, int length) {
+        originalLocations.put(ship, new Pair<>(ship.getLayoutX(), ship.getLayoutY()));
         ship.setUserData(length);
 
         ship.setOnDragDetected(event -> {
@@ -214,6 +229,7 @@ public class AssembleBoardController {
                             boardGrid.getChildren().remove(ship);
 
                             if (newShip) {
+                                Resources.SFX.SCRIBBLE_SFX.play();
                                 letsgo.setDisable(!shipsContainer.getChildren().isEmpty());
                                 int total = 10 - shipsContainer.getChildren().size();
                                 Client.getInstance().sendMessageWithoutResponse(new AssemblyPlacedShipMessage(total));
@@ -298,5 +314,40 @@ public class AssembleBoardController {
         }
 
         return true;
+    }
+
+    @FXML
+    public void onRandomizePressed() {
+        Random random = new Random();
+        while (!shipsContainer.getChildren().isEmpty()) {
+            ImageView toPlace = (ImageView) shipsContainer.getChildren().getFirst();
+
+            while (true) {
+                int row = random.nextInt(10);
+                int col = random.nextInt(10);
+                int length = (int) toPlace.getUserData();
+                boolean isVertical = random.nextBoolean();
+
+                if (isValidPosition(toPlace, col, row, length, isVertical)) {
+                    shipsContainer.getChildren().remove(toPlace);
+                    if (isVertical) boardGrid.add(toPlace, col, row, 1, length);
+                    else boardGrid.add(toPlace, col, row, length, 1);
+
+                    if (isVertical) {
+                        double cellWidth = boardGrid.getWidth() / 10;
+                        toPlace.setRotate(90);
+                        toPlace.setTranslateX(-((length - 1) * cellWidth / 2));
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        Resources.SFX.SNEAKY_SFX.play();
+        Client.getInstance().sendMessageWithoutResponse(new AssemblyPlacedShipMessage(10));
+        letsgo.setDisable(false);
+        randomizeButton.setManaged(false);
+        randomizeButton.setVisible(false);
     }
 }

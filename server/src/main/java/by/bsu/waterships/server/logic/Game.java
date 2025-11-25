@@ -2,10 +2,7 @@ package by.bsu.waterships.server.logic;
 
 import by.bsu.waterships.server.runnables.Server;
 import by.bsu.waterships.shared.Constants;
-import by.bsu.waterships.shared.messages.game.GameAttackMessageResult;
-import by.bsu.waterships.shared.messages.game.GameBeginMessage;
-import by.bsu.waterships.shared.messages.game.GameTurnMessage;
-import by.bsu.waterships.shared.messages.game.GameUpdateOpponentMessage;
+import by.bsu.waterships.shared.messages.game.*;
 import by.bsu.waterships.shared.messages.introduction.IntroductionEndMessage;
 import by.bsu.waterships.shared.messages.introduction.IntroductionSubmitProgressMessage;
 import by.bsu.waterships.shared.types.*;
@@ -92,6 +89,9 @@ public class Game {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        if (opponentBoard.allShipsDestroyed())
+            Server.getInstance().broadcast(new GameFinishMessage(attacker));
     }
 
     private void switchTurn(PlayerIndex index) {

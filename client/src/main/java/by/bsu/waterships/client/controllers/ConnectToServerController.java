@@ -1,6 +1,8 @@
 package by.bsu.waterships.client.controllers;
 
 import by.bsu.waterships.client.runnables.Client;
+import by.bsu.waterships.client.state.Resources;
+import by.bsu.waterships.shared.types.MessageCode;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -43,22 +45,31 @@ public class ConnectToServerController {
         client.setListener(new Client.ClientListener() {
             @Override
             public void onConnect() {
-                SceneController.getInstance().activate(SceneController.WAIT_SCENE);
+                Platform.runLater(() -> SceneController.getInstance().activate(SceneController.WAIT_SCENE));
             }
 
             @Override
             public void onDisconnect() {
-                setConnecting(false);
-                Platform.runLater(() -> error("не удалось проверить соединение с сервером"));
+                Platform.runLater(() -> {
+                    setConnecting(false);
+                    error("не удалось проверить соединение с сервером");
+                });
                 System.err.println("got disconnected from " + ipField.getText() + " (did the ping message fail?)");
             }
 
             @Override
             public void onError(Exception e) {
-                setConnecting(false);
-                Platform.runLater(() -> error("при подключении к серверу произошла ошибка"));
+                Platform.runLater(() -> {
+                    setConnecting(false);
+                    error("при подключении к серверу произошла ошибка");
+                });
                 System.err.println("failed to connect to " + ipField.getText() + ": " + e.getMessage());
             }
+        });
+        // this may happen immediately after connecting
+        client.addCommandListener(message -> {
+            if (message.getCode() == MessageCode.INTRODUCTION_START)
+                Platform.runLater(() -> SceneController.getInstance().activate(SceneController.INTRODUCE_SCENE));
         });
         client.start();
     }
@@ -71,6 +82,7 @@ public class ConnectToServerController {
 
     @FXML
     public void onBackPressed() {
+        Resources.SFX.RESTART_SFX.play();
         SceneController.getInstance().activate(SceneController.MENU_SCENE);
     }
 

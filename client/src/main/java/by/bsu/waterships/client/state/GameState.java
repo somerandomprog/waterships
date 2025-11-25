@@ -7,6 +7,7 @@ public class GameState {
     private static GameState instance;
 
     public PlayerIndex index;
+    public PlayerIndex winnerIndex;
 
     public Image meImage;
     public Image opponentImage;
@@ -22,6 +23,7 @@ public class GameState {
         opponentImage = null;
         shipsSnapshot = null;
         index = null;
+        winnerIndex = null;
     }
 
     public static GameState getInstance() {

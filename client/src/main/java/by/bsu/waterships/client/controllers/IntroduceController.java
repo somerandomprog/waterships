@@ -2,6 +2,7 @@ package by.bsu.waterships.client.controllers;
 
 import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.GameState;
+import by.bsu.waterships.client.state.Resources;
 import by.bsu.waterships.shared.Constants;
 import by.bsu.waterships.shared.messages.introduction.IntroductionSubmitProgressMessageResult;
 import by.bsu.waterships.shared.messages.introduction.IntroductionUpdateOpponentMessage;
@@ -22,6 +23,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -63,11 +65,17 @@ public class IntroduceController {
                 nameField.setText(newValue.substring(0, NAME_FIELD_MAX_LENGTH));
             }
         });
+        Resources.SFX.DRAWING_SFX.setCycleCount(AudioClip.INDEFINITE);
     }
 
     private Image _lastRenderedImage;
 
     public void switched() {
+        opponentName.setText("");
+        opponentImageView.setImage(null);
+
+        Resources.SFX.PAPER_SFX.play();
+
         listener = message -> {
             if (message.getCode() == MessageCode.INTRODUCTION_SUBMIT_PROGRESS) {
                 Platform.runLater(() -> {
@@ -85,6 +93,7 @@ public class IntroduceController {
                         );
                         _lastRenderedImage = wimage;
                     } catch (Exception ignored) {
+
                     }
                 });
             } else if (message.getCode() == MessageCode.INTRODUCTION_UPDATE_OPPONENT) {
@@ -104,12 +113,14 @@ public class IntroduceController {
         };
         Client.getInstance().addCommandListener(listener);
 
+        nameField.setText("");
         gc = canvas.getGraphicsContext2D();
         gc.setStroke(DRAW_COLOR);
         gc.setLineWidth(DRAW_LINE_WIDTH);
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         canvas.setOnMousePressed(event -> {
+            Resources.SFX.DRAWING_SFX.play();
             prevX = event.getX();
             prevY = event.getY();
             gc.beginPath();
@@ -125,6 +136,7 @@ public class IntroduceController {
         });
 
         canvas.setOnMouseReleased(event -> {
+            Resources.SFX.DRAWING_SFX.stop();
             gc.closePath();
         });
 

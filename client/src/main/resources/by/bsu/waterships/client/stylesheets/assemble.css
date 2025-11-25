@@ -13,3 +13,11 @@
 #letsgo.waiting {
     -fx-background-image: url(../textures/buttons/waiting.png);
 }
+
+#randomize {
+    -fx-background-image: url(../textures/buttons/randomize.png);
+}
+
+#randomize:hover {
+    -fx-background-image: url(../textures/buttons/randomize_hover.png);
+}

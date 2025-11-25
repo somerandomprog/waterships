@@ -3,10 +3,9 @@ package by.bsu.waterships.shared.types;
 public enum MessageCode {
     RESULT,
     PING,
+    HANDSHAKE,
     INTERRUPT,
-
     DISCONNECT,
-    GET_PLAYER_INDEX,
 
     INTRODUCTION_START,
     INTRODUCTION_SUBMIT_PROGRESS,

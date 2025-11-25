@@ -11,4 +11,9 @@ public class GameFinishMessage extends Message {
         super(MessageCode.GAME_FINISH);
         this.winner = winner;
     }
+
+    @Override
+    public String toString() {
+        return "winner: " + winner.name();
+    }
 }

@@ -52,28 +52,35 @@ public class Server implements Runnable {
 
                 ClientHandler handler = new ClientHandler(socket,
                         handlers.isEmpty() ? PlayerIndex.PLAYER_1 : PlayerIndex.PLAYER_2);
-                handler.setListener(() -> {
-                    System.out.println("disconnected socket [" + (handler.index.ordinal() + 1) + "]");
-                    if (handler.index == PlayerIndex.PLAYER_1 && handlers.size() == Constants.MAX_SOCKETS) {
-                        System.out.println("reassigning sockets. socket [2] is now [1]");
-                        handlers.get(1).index = PlayerIndex.PLAYER_1;
-                    }
-                    handlers.remove(handler.index.ordinal());
+                handler.setListener(new ClientHandler.ClientHandlerListener() {
+                    @Override
+                    public void onDisconnected() {
+                        System.out.println("disconnected socket [" + (handler.index.ordinal() + 1) + "]");
+                        if (handler.index == PlayerIndex.PLAYER_1 && handlers.size() == Constants.MAX_SOCKETS) {
+                            System.out.println("reassigning sockets. socket [2] is now [1]");
+                            handlers.get(1).index = PlayerIndex.PLAYER_1;
+                        }
+                        handlers.remove(handler.index.ordinal());
 
-                    if (handlers.isEmpty()) {
-                        System.out.println("destroying current game session (all players left)");
-                        currentSession.dispose();
-                        currentSession = null;
+                        if (handlers.isEmpty()) {
+                            System.out.println("destroying current game session (all players left)");
+                            currentSession.dispose();
+                            currentSession = null;
+                        }
+                    }
+
+                    @Override
+                    public void onConnectionEstablished() {
+                        System.out.println("established connection with socket [" + (handler.index.ordinal() + 1) + "]");
+                        if (handlers.size() == 2) {
+                            System.out.println("beginning introduction");
+                            currentSession.setState(GameState.INTRODUCTION);
+                            broadcast(new IntroductionStartMessage(Constants.INTRODUCTION_DURATION_SECONDS));
+                        }
                     }
                 });
                 handler.start();
                 handlers.add(handler);
-
-                if (handlers.size() == 2) {
-                    System.out.println("beginning introduction");
-                    currentSession.setState(GameState.INTRODUCTION);
-                    broadcast(new IntroductionStartMessage(Constants.INTRODUCTION_DURATION_SECONDS));
-                }
             }
         } catch (Exception e) {
             System.err.println("failed to start server socket on port " + Constants.PORT + " (is it already in use?)");

@@ -1,9 +1,10 @@
 module by.bsu.waterships.client {
+    requires by.bsu.waterships.shared;
     requires javafx.controls;
     requires javafx.fxml;
-    requires shared;
     requires java.desktop;
     requires javafx.swing;
+    requires javafx.media;
 
     opens by.bsu.waterships.client to javafx.fxml;
     opens by.bsu.waterships.client.controllers to javafx.fxml;

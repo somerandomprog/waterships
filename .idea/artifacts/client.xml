@@ -1,0 +1,35 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="client">
+    <output-path>$PROJECT_DIR$/out/artifacts/client</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="by.bsu.waterships.client.WatershipsApplication" />
+        <option name="description" value="" />
+        <option name="height" value="720" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="nativeBundle" value="exe" />
+        <option name="title" value="waterships" />
+        <option name="vendor" value="" />
+        <option name="version" value="" />
+        <option name="width" value="1280" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="client.jar">
+        <element id="module-output" name="client" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-base:win:21" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:21" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:win:21" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-fxml:21" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:21" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-media:21" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-media:win:21" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-swing:21" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-base:21" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-fxml:win:21" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:win:21" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-swing:win:21" />
+      </element>
+    </root>
+  </artifact>
+</component>

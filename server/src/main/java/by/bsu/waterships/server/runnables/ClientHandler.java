@@ -20,6 +20,8 @@ import java.net.SocketException;
 public class ClientHandler extends Thread {
     public interface ClientHandlerListener {
         void onDisconnected();
+
+        void onConnectionEstablished();
     }
 
     private final Socket socket;
@@ -48,6 +50,7 @@ public class ClientHandler extends Thread {
             oos = new ObjectOutputStream(socket.getOutputStream());
             ois = new ObjectInputStream(socket.getInputStream());
             socket.setSoTimeout(Constants.KEEPALIVE_DELAY);
+            send(new HandshakeMessage(index));
 
             while (true) {
                 Message message = ThrowableUtils.nullIfThrows(() -> (Message) ois.readObject());
@@ -101,6 +104,10 @@ public class ClientHandler extends Thread {
                     }
                     return false;
                 }
+                case HandshakeMessageResult hsmr: {
+                    if (listener != null) listener.onConnectionEstablished();
+                    return false;
+                }
                 case IntroductionSubmitProgressMessageResult sipmr: {
                     try {
                         getOpponentHandler().send(new IntroductionUpdateOpponentMessage(sipmr.info));
@@ -117,10 +124,6 @@ public class ClientHandler extends Thread {
             switch (message.getCode()) {
                 case PING: {
                     send(message.respond(new PingMessageResult()));
-                    break;
-                }
-                case GET_PLAYER_INDEX: {
-                    send(message.respond(new GetPlayerIndexMessageResult(index)));
                     break;
                 }
 

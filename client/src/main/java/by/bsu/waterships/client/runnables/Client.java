@@ -1,10 +1,9 @@
 package by.bsu.waterships.client.runnables;
 
 
+import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.shared.Constants;
-import by.bsu.waterships.shared.messages.DisconnectMessage;
-import by.bsu.waterships.shared.messages.PingMessage;
-import by.bsu.waterships.shared.messages.PingMessageResult;
+import by.bsu.waterships.shared.messages.*;
 import by.bsu.waterships.shared.types.Message;
 import by.bsu.waterships.shared.types.MessageCode;
 import by.bsu.waterships.shared.types.MessageResult;
@@ -16,10 +15,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class Client extends Thread {
     public interface ClientListener {
@@ -54,8 +50,14 @@ public class Client extends Thread {
     private Client(String host) {
         this.host = host;
         addCommandListener(message -> {
-            if (message.getCode() == MessageCode.PING)
+            if (message.getCode() == MessageCode.PING) {
                 sendMessageWithoutResponse(message.respond(new PingMessageResult()));
+            } else if (message.getCode() == MessageCode.HANDSHAKE) {
+                GameState.getInstance().index = ((HandshakeMessage) message).index;
+                sendMessageWithoutResponse(new HandshakeMessageResult());
+                connected = true;
+                if (listener != null) Platform.runLater(() -> listener.onConnect());
+            }
         });
     }
 
@@ -90,8 +92,6 @@ public class Client extends Thread {
             oos = new ObjectOutputStream(socket.getOutputStream());
 
             System.out.println("initialized socket to " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
-            if (listener != null) Platform.runLater(() -> listener.onConnect());
-
             try {
                 while (true) {
                     Message message = ThrowableUtils.nullIfThrows(() -> (Message) ois.readObject());

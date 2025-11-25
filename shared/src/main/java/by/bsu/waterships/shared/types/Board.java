@@ -9,12 +9,13 @@ public class Board implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public record AttackResult(Point point, boolean missed, Ship destroyedShip,
-                               List<Point> markMissed) implements Serializable {
+                               List<Point> idlePoints) implements Serializable {
     }
 
     public static class Ship implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
+        public int index;
 
         public int length;
         public Point start;
@@ -27,7 +28,8 @@ public class Board implements Serializable {
             return points;
         }
 
-        public Ship(Point start, int length, boolean vertical) {
+        public Ship(int index, Point start, int length, boolean vertical) {
+            this.index = index;
             this.length = length;
             this.start = start;
             this.vertical = vertical;
@@ -35,14 +37,25 @@ public class Board implements Serializable {
             for (int i = 0; i < length; i++)
                 points.add(new Point(vertical ? start.x() : start.x() + i, vertical ? start.y() + i : start.y()));
         }
+
+        @Override
+        public String toString() {
+            return "Ship{" +
+                    "index=" + index +
+                    ", length=" + length +
+                    ", start=" + start +
+                    ", vertical=" + vertical +
+                    ", destroyed=" + destroyed +
+                    '}';
+        }
     }
 
     private final List<Ship> ships = new ArrayList<>();
     private final List<Point> destroyed = new ArrayList<>();
     private final List<Point> missed = new ArrayList<>();
 
-    public void addShip(Point start, int length, boolean vertical) {
-        ships.add(new Ship(start, length, vertical));
+    public void addShip(Ship ship) {
+        ships.add(ship);
     }
 
     @Override
@@ -85,7 +98,7 @@ public class Board implements Serializable {
                 .orElse(null);
         if (ship == null) {
             missed.add(point);
-            return new AttackResult(point, true, null, Collections.singletonList(point));
+            return new AttackResult(point, true, null, List.of());
         }
 
         destroyed.add(point);
@@ -95,9 +108,13 @@ public class Board implements Serializable {
         HashSet<Point> surrounding = new HashSet<>();
         for (Point p : ship.points) surrounding.addAll(p.getSurrounding());
 
-        List<Point> markMissed = surrounding.stream().filter(p -> !missed.contains(p) && !destroyed.contains(p)).toList();
-        missed.addAll(markMissed);
+        List<Point> idle = surrounding.stream().filter(p -> !missed.contains(p) && !destroyed.contains(p)).toList();
+        missed.addAll(idle);
         ship.destroyed = true;
-        return new AttackResult(point, false, ship, markMissed);
+        return new AttackResult(point, false, ship, idle);
+    }
+
+    public boolean allShipsDestroyed() {
+        return ships.stream().allMatch(ship -> ship.destroyed);
     }
 }

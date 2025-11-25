@@ -1,0 +1,7 @@
+#back {
+    -fx-background-image: url(../textures/buttons/back.png);
+}
+
+#back:hover {
+    -fx-background-image: url(../textures/buttons/back_hover.png);
+}

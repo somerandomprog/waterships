@@ -4,12 +4,13 @@ import by.bsu.waterships.client.controllers.SceneController;
 import by.bsu.waterships.client.state.Resources;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class WatershipsApplication extends Application {
 
@@ -17,6 +18,8 @@ public class WatershipsApplication extends Application {
     public void start(Stage stage) throws IOException {
         Resources.TITLE_FONT = Font.loadFont(WatershipsApplication.class.getResourceAsStream("fonts/briston.otf"), 48);
         Resources.BODY_FONT = Font.loadFont(WatershipsApplication.class.getResourceAsStream("fonts/klyakson.ttf"), 48);
+        Resources.DEATH_CELL_TEXTURE = new Image(Objects.requireNonNull(WatershipsApplication.class.getResourceAsStream("textures/board/death.png")));
+        Resources.MISSED_CELL_TEXTURE = new Image(Objects.requireNonNull(WatershipsApplication.class.getResourceAsStream("textures/board/miss.png")));
 
         SceneController controller = SceneController.getInstance(stage);
         controller.add(SceneController.MENU_SCENE, "views/menu-view.fxml");

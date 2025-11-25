@@ -5,12 +5,10 @@ import by.bsu.waterships.shared.messages.*;
 import by.bsu.waterships.shared.messages.assembly.AssemblyPlacedShipMessage;
 import by.bsu.waterships.shared.messages.assembly.AssemblyReadyMessage;
 import by.bsu.waterships.shared.messages.assembly.AssemblyUpdateOpponentMessage;
+import by.bsu.waterships.shared.messages.game.GameAttackMessage;
 import by.bsu.waterships.shared.messages.introduction.IntroductionSubmitProgressMessageResult;
 import by.bsu.waterships.shared.messages.introduction.IntroductionUpdateOpponentMessage;
-import by.bsu.waterships.shared.types.Board;
-import by.bsu.waterships.shared.types.Message;
-import by.bsu.waterships.shared.types.MessageCode;
-import by.bsu.waterships.shared.types.PlayerIndex;
+import by.bsu.waterships.shared.types.*;
 import by.bsu.waterships.shared.utils.ThrowableUtils;
 
 import java.io.IOException;
@@ -141,6 +139,11 @@ public class ClientHandler extends Thread {
                 // game
                 case GAME_READY: {
                     Server.getInstance().getCurrentSession().playerReady(index);
+                    break;
+                }
+                case GAME_ATTACK: {
+                    Point point = ((GameAttackMessage) message).where;
+                    Server.getInstance().getCurrentSession().handleAttack(message, index, point);
                     break;
                 }
             }

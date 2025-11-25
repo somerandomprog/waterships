@@ -2,12 +2,15 @@ package by.bsu.waterships.shared.types;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Board implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
+    public record AttackResult(Point point, boolean missed, Ship destroyedShip,
+                               List<Point> markMissed) implements Serializable {
+    }
 
     public static class Ship implements Serializable {
         @Serial
@@ -72,5 +75,29 @@ public class Board implements Serializable {
             sb.append('\n');
         }
         return sb.toString().trim();
+    }
+
+    public AttackResult attack(Point point) {
+        Ship ship = ships
+                .stream()
+                .filter(s -> s.points.contains(point))
+                .findFirst()
+                .orElse(null);
+        if (ship == null) {
+            missed.add(point);
+            return new AttackResult(point, true, null, Collections.singletonList(point));
+        }
+
+        destroyed.add(point);
+        boolean destroyedCompletely = destroyed.containsAll(ship.points);
+        if (!destroyedCompletely) return new AttackResult(point, false, null, List.of());
+
+        HashSet<Point> surrounding = new HashSet<>();
+        for (Point p : ship.points) surrounding.addAll(p.getSurrounding());
+
+        List<Point> markMissed = surrounding.stream().filter(p -> !missed.contains(p) && !destroyed.contains(p)).toList();
+        missed.addAll(markMissed);
+        ship.destroyed = true;
+        return new AttackResult(point, false, ship, markMissed);
     }
 }

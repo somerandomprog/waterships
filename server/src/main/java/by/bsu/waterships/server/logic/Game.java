@@ -2,18 +2,21 @@ package by.bsu.waterships.server.logic;
 
 import by.bsu.waterships.server.runnables.Server;
 import by.bsu.waterships.shared.Constants;
+import by.bsu.waterships.shared.messages.game.GameAttackMessageResult;
 import by.bsu.waterships.shared.messages.game.GameBeginMessage;
 import by.bsu.waterships.shared.messages.game.GameTurnMessage;
+import by.bsu.waterships.shared.messages.game.GameUpdateOpponentMessage;
 import by.bsu.waterships.shared.messages.introduction.IntroductionEndMessage;
 import by.bsu.waterships.shared.messages.introduction.IntroductionSubmitProgressMessage;
-import by.bsu.waterships.shared.types.Board;
-import by.bsu.waterships.shared.types.PlayerIndex;
-import by.bsu.waterships.shared.types.PlayerInfo;
+import by.bsu.waterships.shared.types.*;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Game {
     private GameState state;
+    private PlayerIndex turn;
+
     private final ConcurrentHashMap<PlayerIndex, Board> boards = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<PlayerIndex, Boolean> ready = new ConcurrentHashMap<>();
 
@@ -72,8 +75,28 @@ public class Game {
         ready.put(which, true);
         if (ready.size() == 2) {
             System.out.println("beginning the game!");
-            Server.getInstance().broadcast(new GameTurnMessage(PlayerIndex.PLAYER_1));
+            switchTurn(PlayerIndex.PLAYER_1);
         }
+    }
+
+    public void handleAttack(Message attackerMessage, PlayerIndex attacker, Point point) {
+        PlayerIndex opponent = attacker == PlayerIndex.PLAYER_1 ? PlayerIndex.PLAYER_2 : PlayerIndex.PLAYER_1;
+
+        Board opponentBoard = boards.get(opponent);
+        Board.AttackResult result = opponentBoard.attack(point);
+
+        try {
+            Server.getInstance().getSocket(attacker).send(attackerMessage.respond(new GameAttackMessageResult(result)));
+            Server.getInstance().getSocket(opponent).send(new GameUpdateOpponentMessage(result));
+            if (result.missed()) switchTurn(opponent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void switchTurn(PlayerIndex index) {
+        turn = index;
+        Server.getInstance().broadcast(new GameTurnMessage(index));
     }
 
     private Thread introductionPollingThread;

@@ -4,6 +4,7 @@ import by.bsu.waterships.client.WatershipsApplication;
 import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.client.state.Resources;
+import by.bsu.waterships.client.state.SceneController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -13,7 +14,7 @@ import javafx.scene.image.ImageView;
 import java.util.Objects;
 import java.util.Random;
 
-public class EndController {
+public class EndController extends SceneController.WatershipsScene {
     @FXML
     public ImageView stickman;
 

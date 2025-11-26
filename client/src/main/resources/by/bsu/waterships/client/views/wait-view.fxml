@@ -17,7 +17,7 @@
                   <Font name="Klyakson" size="48.0" />
                </font>
             </Label>
-            <Label fx:id="firstPlayerLabel" alignment="CENTER" text="вы первый игрок!&#10;ждём вашего соперника...&#10;" textAlignment="CENTER" textFill="#234bb4">
+            <Label fx:id="firstPlayerLabel" alignment="CENTER" style="-fx-line-spacing: -15px;" text="вы первый игрок!&#10;ждём вашего соперника...&#10;" textAlignment="CENTER" textFill="#234bb4">
                <font>
                   <Font name="Klyakson" size="48.0" />
                </font>

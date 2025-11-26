@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<VBox id="bg" alignment="CENTER" prefHeight="720.0" prefWidth="1280.0" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.InterruptedController">
+   <padding>
+      <Insets left="160.0" />
+   </padding>
+   <children>
+      <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+         <children>
+            <Label fx:id="statusLabel" text="что-то пошло не так..." textFill="#234bb4">
+               <font>
+                  <Font name="Bristol" size="52.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Label>
+            <Label fx:id="firstPlayerLabel" alignment="CENTER" style="-fx-line-spacing: -10px;" text="(скорее всего) ваш соперник покинул игру.&#10;продолжать играть нельзя." textAlignment="CENTER" textFill="#234bb4">
+               <font>
+                  <Font name="Klyakson" size="40.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Label>
+            <Button id="back" mnemonicParsing="false" onAction="#onBackPressed" prefHeight="95.0" prefWidth="200.0" rotate="1.0" />
+         </children>
+      </VBox>
+   </children>
+   <stylesheets>
+      <URL value="@../stylesheets/global.css" />
+      <URL value="@../stylesheets/back.css" />
+   </stylesheets>
+</VBox>

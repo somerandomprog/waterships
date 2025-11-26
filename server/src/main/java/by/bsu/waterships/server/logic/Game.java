@@ -90,8 +90,10 @@ public class Game {
             throw new RuntimeException(e);
         }
 
-        if (opponentBoard.allShipsDestroyed())
+        if (opponentBoard.allShipsDestroyed()) {
+            setState(GameState.END);
             Server.getInstance().broadcast(new GameFinishMessage(attacker));
+        }
     }
 
     private void switchTurn(PlayerIndex index) {

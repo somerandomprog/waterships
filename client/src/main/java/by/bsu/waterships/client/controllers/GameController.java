@@ -3,6 +3,7 @@ package by.bsu.waterships.client.controllers;
 import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.client.state.Resources;
+import by.bsu.waterships.client.state.SceneController;
 import by.bsu.waterships.shared.messages.game.*;
 import by.bsu.waterships.shared.types.Board;
 import by.bsu.waterships.shared.types.PlayerIndex;
@@ -18,7 +19,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-public class GameController {
+public class GameController extends SceneController.WatershipsScene {
     @FXML
     public GridPane opponentGrid;
     @FXML

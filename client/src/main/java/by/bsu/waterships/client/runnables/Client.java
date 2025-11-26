@@ -36,7 +36,7 @@ public class Client extends Thread {
     private final ConcurrentHashMap<String, CompletableFuture<MessageResult>> pendingMessages = new ConcurrentHashMap<>();
 
     private ClientListener listener;
-    private List<ClientCommandListener> commandListeners = new ArrayList<>();
+    private ConcurrentLinkedQueue<ClientCommandListener> commandListeners = new ConcurrentLinkedQueue<>();
     private String host;
     private boolean connected;
 
@@ -93,7 +93,7 @@ public class Client extends Thread {
 
             System.out.println("initialized socket to " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
             try {
-                while (true) {
+                while (!Thread.currentThread().isInterrupted()) {
                     Message message = ThrowableUtils.nullIfThrows(() -> (Message) ois.readObject());
                     if (message == null) continue;
                     if (message instanceof MessageResult && pendingMessages.containsKey(message.getCorrelationId())) {
@@ -107,6 +107,10 @@ public class Client extends Thread {
                             commandListener.onMessage(message);
                     }
                 }
+            } catch (InterruptedException e) {
+                interrupt();
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
             } finally {
                 disconnect();
             }
@@ -120,6 +124,7 @@ public class Client extends Thread {
             connected = false;
             cleanup();
             if (listener != null) listener.onDisconnect();
+            interrupt();
         });
     }
 

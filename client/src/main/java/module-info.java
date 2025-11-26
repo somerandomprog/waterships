@@ -5,6 +5,7 @@ module by.bsu.waterships.client {
     requires java.desktop;
     requires javafx.swing;
     requires javafx.media;
+    requires javafx.graphics;
 
     opens by.bsu.waterships.client to javafx.fxml;
     opens by.bsu.waterships.client.controllers to javafx.fxml;

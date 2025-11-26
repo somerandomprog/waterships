@@ -71,7 +71,7 @@
       </VBox>
    </children>
    <stylesheets>
-      <URL value="@../stylesheets/about.css" />
+      <URL value="@../stylesheets/back.css" />
       <URL value="@../stylesheets/global.css" />
    </stylesheets>
 </VBox>

@@ -3,6 +3,7 @@ package by.bsu.waterships.client.controllers;
 import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.client.state.Resources;
+import by.bsu.waterships.client.state.SceneController;
 import by.bsu.waterships.shared.Constants;
 import by.bsu.waterships.shared.messages.introduction.IntroductionSubmitProgressMessageResult;
 import by.bsu.waterships.shared.messages.introduction.IntroductionUpdateOpponentMessage;
@@ -33,7 +34,7 @@ import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-public class IntroduceController {
+public class IntroduceController extends SceneController.WatershipsScene {
     @FXML
     public Canvas canvas;
 

@@ -3,13 +3,14 @@ package by.bsu.waterships.client.controllers;
 import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.client.state.Resources;
+import by.bsu.waterships.client.state.SceneController;
 import by.bsu.waterships.shared.types.MessageCode;
 import by.bsu.waterships.shared.types.PlayerIndex;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-public class WaitController {
+public class WaitController extends SceneController.WatershipsScene {
     @FXML
     public Label statusLabel;
 

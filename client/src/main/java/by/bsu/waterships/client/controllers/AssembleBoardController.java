@@ -3,6 +3,7 @@ package by.bsu.waterships.client.controllers;
 import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.client.state.Resources;
+import by.bsu.waterships.client.state.SceneController;
 import by.bsu.waterships.shared.messages.assembly.AssemblyPlacedShipMessage;
 import by.bsu.waterships.shared.messages.assembly.AssemblyReadyMessage;
 import by.bsu.waterships.shared.messages.assembly.AssemblyUpdateOpponentMessage;
@@ -33,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static by.bsu.waterships.shared.utils.NullUtils.coalesce;
 
-public class AssembleBoardController {
+public class AssembleBoardController extends SceneController.WatershipsScene {
     @FXML
     public GridPane boardGrid;
     @FXML

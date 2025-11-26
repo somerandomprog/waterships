@@ -1,9 +1,10 @@
 package by.bsu.waterships.client.controllers;
 
 import by.bsu.waterships.client.state.Resources;
+import by.bsu.waterships.client.state.SceneController;
 import javafx.fxml.FXML;
 
-public class MenuController {
+public class MenuController extends SceneController.WatershipsScene {
     @FXML
     public void onPlayPressed() {
         Resources.SFX.PAPER_SFX.play();

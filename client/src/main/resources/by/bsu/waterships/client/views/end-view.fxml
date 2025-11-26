@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<Pane id="bg" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.EndController">
+<Pane id="bg" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsu.waterships.client.controllers.EndController">
    <children>
       <StackPane alignment="BOTTOM_RIGHT" layoutY="154.0" prefHeight="566.0" prefWidth="496.0">
          <children>
@@ -44,6 +44,6 @@
    </children>
    <stylesheets>
       <URL value="@../stylesheets/global.css" />
-      <URL value="@../stylesheets/end.css" />
+      <URL value="@../stylesheets/back.css" />
    </stylesheets>
 </Pane>

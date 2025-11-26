@@ -24,6 +24,7 @@ public class Resources {
         public static AudioClip DRAWING_SFX = clip("sounds/drawing.mp3");
         public static AudioClip SNEAKY_SFX = clip("sounds/sneaky.mp3");
         public static AudioClip START_SFX = clip("sounds/start.mp3");
+        public static AudioClip INTERRUPTED_SFX = clip("sounds/interrupt.mp3");
 
         private static AudioClip clip(String path) {
             return new AudioClip(Objects.requireNonNull(WatershipsApplication.class.getResource(path)).toString());

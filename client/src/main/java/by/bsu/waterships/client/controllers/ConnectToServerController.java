@@ -2,20 +2,17 @@ package by.bsu.waterships.client.controllers;
 
 import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.Resources;
+import by.bsu.waterships.client.state.SceneController;
 import by.bsu.waterships.shared.types.MessageCode;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
 
 import java.util.regex.Pattern;
 
-public class ConnectToServerController {
+public class ConnectToServerController extends SceneController.WatershipsScene {
     private static final Pattern IP_ADDRESS_REGEX = Pattern.compile("^(((?!25?[6-9])[12]\\d|[1-9])?\\d\\.?\\b){4}$");
     private static final int CONNECT_ANIMATION_DELAY = 250;
 
@@ -45,7 +42,8 @@ public class ConnectToServerController {
         client.setListener(new Client.ClientListener() {
             @Override
             public void onConnect() {
-                Platform.runLater(() -> SceneController.getInstance().activate(SceneController.WAIT_SCENE));
+                if (SceneController.getInstance().getCurrent().equals(SceneController.CONNECT_TO_SERVER_SCENE))
+                    Platform.runLater(() -> SceneController.getInstance().activate(SceneController.WAIT_SCENE));
             }
 
             @Override
@@ -70,6 +68,8 @@ public class ConnectToServerController {
         client.addCommandListener(message -> {
             if (message.getCode() == MessageCode.INTRODUCTION_START)
                 Platform.runLater(() -> SceneController.getInstance().activate(SceneController.INTRODUCE_SCENE));
+            else if (message.getCode() == MessageCode.INTERRUPT)
+                Platform.runLater(() -> SceneController.getInstance().activate(SceneController.INTERRUPTED_SCENE));
         });
         client.start();
     }

@@ -3,6 +3,7 @@ package by.bsu.waterships.server.runnables;
 import by.bsu.waterships.server.logic.Game;
 import by.bsu.waterships.server.logic.GameState;
 import by.bsu.waterships.shared.Constants;
+import by.bsu.waterships.shared.messages.InterruptMessage;
 import by.bsu.waterships.shared.messages.introduction.IntroductionStartMessage;
 import by.bsu.waterships.shared.types.Message;
 import by.bsu.waterships.shared.types.PlayerIndex;
@@ -62,8 +63,13 @@ public class Server implements Runnable {
                         }
                         handlers.remove(handler.index.ordinal());
 
-                        if (handlers.isEmpty()) {
-                            System.out.println("destroying current game session (all players left)");
+                        if (currentSession == null) return;
+                        if (currentSession.getState() != GameState.WAITING_FOR_PLAYERS && currentSession.getState() != GameState.END)
+                            broadcast(new InterruptMessage());
+
+                        boolean sessionVoided = handlers.isEmpty() || (handlers.size() == 1 && currentSession.getState() != GameState.WAITING_FOR_PLAYERS && currentSession.getState() != GameState.END);
+                        if (sessionVoided) {
+                            System.out.println("destroying current game session: " + (handlers.isEmpty() ? "all players left" : "one of the players left while the game was ongoing"));
                             currentSession.dispose();
                             currentSession = null;
                         }

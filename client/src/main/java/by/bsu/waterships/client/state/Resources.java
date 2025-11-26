@@ -3,15 +3,10 @@ package by.bsu.waterships.client.state;
 import by.bsu.waterships.client.WatershipsApplication;
 import javafx.scene.image.Image;
 import javafx.scene.media.AudioClip;
-import javafx.scene.media.Media;
-import javafx.scene.text.Font;
 
 import java.util.Objects;
 
 public class Resources {
-    public static Font TITLE_FONT = Font.loadFont(WatershipsApplication.class.getResourceAsStream("fonts/briston.otf"), 48);
-    public static Font BODY_FONT = Font.loadFont(WatershipsApplication.class.getResourceAsStream("fonts/klyakson.ttf"), 48);
-
     public static Image DEATH_CELL_TEXTURE = new Image(Objects.requireNonNull(WatershipsApplication.class.getResourceAsStream("textures/board/death.png")));
     public static Image MISSED_CELL_TEXTURE = new Image(Objects.requireNonNull(WatershipsApplication.class.getResourceAsStream("textures/board/miss.png")));
 

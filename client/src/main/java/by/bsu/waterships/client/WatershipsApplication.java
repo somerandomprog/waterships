@@ -1,21 +1,21 @@
 package by.bsu.waterships.client;
 
 import by.bsu.waterships.client.controllers.SceneController;
-import by.bsu.waterships.client.state.Resources;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class WatershipsApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        Font.loadFont(WatershipsApplication.class.getResourceAsStream("fonts/briston.otf"), 48);
+        Font.loadFont(WatershipsApplication.class.getResourceAsStream("fonts/klyakson.ttf"), 48);
+
         SceneController controller = SceneController.getInstance(stage);
         controller.add(SceneController.MENU_SCENE, "views/menu-view.fxml");
         controller.add(SceneController.ABOUT_SCENE, "views/about-view.fxml");

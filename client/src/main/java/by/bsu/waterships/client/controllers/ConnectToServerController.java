@@ -75,7 +75,7 @@ public class ConnectToServerController extends SceneController.WatershipsScene {
     }
 
     public void switchedAway() {
-        Client.getInstance().setListener(null);
+        if(Client.getInstance() != null) Client.getInstance().setListener(null);
         setConnecting(false);
         error("");
     }

@@ -64,8 +64,8 @@ public class GameController {
         meName.setText(gameState.meName);
         shipsSnapshot.setImage(gameState.shipsSnapshot);
 
-        for(Node n: meShipsContainer.getChildren()) n.setEffect(null);
-        for(Node n: opponentShipsContainer.getChildren()) n.setEffect(null);
+        for (Node n : meShipsContainer.getChildren()) n.setEffect(null);
+        for (Node n : opponentShipsContainer.getChildren()) n.setEffect(null);
 
         listener = message -> {
             switch (message.getCode()) {
@@ -97,10 +97,14 @@ public class GameController {
                     Platform.runLater(() -> {
                         // do not add idle points here
                         setCell(meGrid, result.point(), !result.missed());
+                        for (Point p : result.idlePoints()) setCell(meGrid, p, false);
                         if (result.destroyedShip() != null) {
                             ImageView destroyedShip = (ImageView) meShipsContainer.getChildren().get(result.destroyedShip().index);
                             destroyedShip.setEffect(new Blend(BlendMode.SRC_ATOP, null, new ColorInput(0, 0, destroyedShip.getFitWidth(), destroyedShip.getFitHeight(), Color.web("#df2024"))));
+                            Resources.SFX.SHIP_DESTROYED_SFX.play();
                         }
+                        if (result.missed()) Resources.SFX.MISS_SFX.play();
+                        else if (result.destroyedShip() == null) Resources.SFX.EXPLOSION_SFX.play();
                     });
                     break;
                 }

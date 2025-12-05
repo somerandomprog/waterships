@@ -14,8 +14,10 @@ import by.bsu.waterships.shared.utils.ThrowableUtils;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Scanner;
 
 public class ClientHandler extends Thread {
     public interface ClientHandlerListener {
@@ -28,8 +30,8 @@ public class ClientHandler extends Thread {
     private ClientHandlerListener listener;
     private int retryAttempts = Constants.KEEPALIVE_RETRY_ATTEMPTS;
 
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
+    private PrintStream output;
+    private Scanner input;
 
     public PlayerIndex index;
 
@@ -47,14 +49,25 @@ public class ClientHandler extends Thread {
     public void run() {
         assert socket != null;
         try {
-            oos = new ObjectOutputStream(socket.getOutputStream());
-            ois = new ObjectInputStream(socket.getInputStream());
+            output = new PrintStream(socket.getOutputStream());
+            input = new Scanner(socket.getInputStream());
             socket.setSoTimeout(Constants.KEEPALIVE_DELAY);
             send(new HandshakeMessage(index));
 
             while (true) {
-                Message message = ThrowableUtils.nullIfThrows(() -> (Message) ois.readObject());
-                if (message == null) {
+                String message = ThrowableUtils.nullIfThrows(() -> input.nextLine());
+                try {
+                    if (message == null) throw new Exception("no message received");
+                    if (!message.startsWith("@")) throw new Exception("message didn't start with \"@\"");
+                    String[] split = message.substring(1).split(";");
+                    if(split.length != 2) throw new Exception("invalid initial payload format: required @class;length");
+
+                    String data = input.nextLine();
+                    boolean shouldDisconnect = handleMessage(message);
+                    if (shouldDisconnect) break;
+                }
+                catch(Exception e) {
+                    System.out.println("pinging [" + (index.ordinal() + 1) + "]: " + e.getMessage());
                     try {
                         send(new PingMessage());
                         retryAttempts--;
@@ -63,13 +76,10 @@ public class ClientHandler extends Thread {
                             System.out.printf("[%d] seems to be disconnected, %d attempt(s) remaining. new timeout: %d ms\n", index.ordinal() + 1, retryAttempts, socket.getSoTimeout());
                         if (retryAttempts == 0) break;
                         continue;
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
                         break;
                     }
                 }
-
-                boolean shouldDisconnect = handleMessage(message);
-                if (shouldDisconnect) break;
             }
         } catch (Exception e) {
             System.err.println("something went wrong while talking to client at " + socket.getInetAddress().getHostAddress() + ": " + e.getMessage());

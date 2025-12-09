@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:attributeGroup name="ActionMessageAttributes">
+        <xs:attribute name="action" type="xs:string" use="required"/>
+        <xs:attribute name="correlationId" type="xs:string"/>
+    </xs:attributeGroup>
+
+    <xs:complexType name="PlayerInfoType">
+        <xs:sequence>
+            <xs:element name="image" type="xs:base64Binary"/>
+            <xs:element name="name" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="IntroductionUpdateOpponentMessage">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="PlayerInfo" type="PlayerInfoType"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="ActionMessageAttributes"/>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

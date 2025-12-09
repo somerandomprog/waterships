@@ -3,57 +3,60 @@ package by.bsu.waterships.shared.types;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
+import javax.xml.bind.annotation.*;
 
+@XmlRootElement(name = "Board")
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = {"ships", "destroyed", "missed"})
 public class Board implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public record AttackResult(Point point, boolean missed, Ship destroyedShip,
-                               List<Point> idlePoints) implements Serializable {
-    }
+    @XmlRootElement(name = "AttackResult")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class AttackResult {
 
-    public static class Ship implements Serializable {
-        @Serial
-        private static final long serialVersionUID = 1L;
-        public int index;
+        @XmlElement(required = true)
+        public Point point;
 
-        public int length;
-        public Point start;
-        public boolean vertical;
-        public boolean destroyed = false;
+        @XmlElement(required = true)
+        public boolean missed;
 
-        private final List<Point> points = new ArrayList<>();
+        @XmlElement(name = "DestroyedShip")
+        public Ship destroyedShip;
 
-        public List<Point> getPoints() {
-            return points;
+        @XmlElementWrapper(name = "IdlePoints")
+        @XmlElement(name = "IdlePoint")
+        public List<Point> idlePoints;
+
+        public AttackResult() {
         }
 
-        public Ship(int index, Point start, int length, boolean vertical) {
-            this.index = index;
-            this.length = length;
-            this.start = start;
-            this.vertical = vertical;
-
-            for (int i = 0; i < length; i++)
-                points.add(new Point(vertical ? start.x() : start.x() + i, vertical ? start.y() + i : start.y()));
-        }
-
-        @Override
-        public String toString() {
-            return "Ship{" +
-                    "index=" + index +
-                    ", length=" + length +
-                    ", start=" + start +
-                    ", vertical=" + vertical +
-                    ", destroyed=" + destroyed +
-                    '}';
+        public AttackResult(Point point, boolean missed, Ship destroyedShip,
+                            List<Point> idlePoints) {
+            this.point = point;
+            this.missed = missed;
+            this.destroyedShip = destroyedShip;
+            this.idlePoints = idlePoints;
         }
     }
 
+    @XmlElementWrapper(name = "Ships")
+    @XmlElement(name = "Ship")
     private final List<Ship> ships = new ArrayList<>();
+
+    @XmlElementWrapper(name = "Destroyed")
+    @XmlElement(name = "Point")
     private final List<Point> destroyed = new ArrayList<>();
+
+    @XmlElementWrapper(name = "Missed")
+    @XmlElement(name = "Point")
     private final List<Point> missed = new ArrayList<>();
 
+    public Board() {
+    }
+
+    @XmlTransient
     public void addShip(Ship ship) {
         ships.add(ship);
     }
@@ -90,6 +93,7 @@ public class Board implements Serializable {
         return sb.toString().trim();
     }
 
+    @XmlTransient
     public AttackResult attack(Point point) {
         Ship ship = ships
                 .stream()
@@ -114,6 +118,7 @@ public class Board implements Serializable {
         return new AttackResult(point, false, ship, idle);
     }
 
+    @XmlTransient
     public boolean allShipsDestroyed() {
         return ships.stream().allMatch(ship -> ship.destroyed);
     }

@@ -1,0 +1,6 @@
+<!ELEMENT HandshakeMessage EMPTY>
+        <!ATTLIST HandshakeMessage
+                action CDATA #FIXED "handshake"
+                index (PLAYER_1 | PLAYER_2) #REQUIRED
+                correlationId CDATA #IMPLIED
+                >

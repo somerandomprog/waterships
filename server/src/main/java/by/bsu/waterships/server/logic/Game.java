@@ -2,9 +2,11 @@ package by.bsu.waterships.server.logic;
 
 import by.bsu.waterships.server.runnables.Server;
 import by.bsu.waterships.shared.Constants;
-import by.bsu.waterships.shared.messages.game.*;
-import by.bsu.waterships.shared.messages.introduction.IntroductionEndMessage;
-import by.bsu.waterships.shared.messages.introduction.IntroductionSubmitProgressMessage;
+import by.bsu.waterships.shared.protocol.ActionMessage;
+import by.bsu.waterships.shared.protocol.GameFinishMessage;
+import by.bsu.waterships.shared.protocol.GameTurnMessage;
+import by.bsu.waterships.shared.protocol.GameUpdateOpponentMessage;
+import by.bsu.waterships.shared.protocol.results.GameAttackResultMessage;
 import by.bsu.waterships.shared.types.*;
 
 import java.io.IOException;
@@ -32,9 +34,9 @@ public class Game {
                             Thread.sleep(Constants.INTRODUCTION_REQUEST_DELAY);
                             total += Constants.INTRODUCTION_REQUEST_DELAY;
                             if (total >= Constants.INTRODUCTION_DURATION_SECONDS * 1000) {
-                                Server.getInstance().broadcast(new IntroductionEndMessage());
+                                Server.getInstance().broadcast(new ActionMessage("introduction_end"));
                                 setState(GameState.ASSEMBLE_BOARD);
-                            } else Server.getInstance().broadcast(new IntroductionSubmitProgressMessage());
+                            } else Server.getInstance().broadcast(new ActionMessage("introduction_submit_progress"));
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
@@ -49,7 +51,7 @@ public class Game {
                 break;
             }
             case PLAYING: {
-                Server.getInstance().broadcast(new GameBeginMessage());
+                Server.getInstance().broadcast(new ActionMessage("game_begin"));
                 break;
             }
         }
@@ -76,16 +78,16 @@ public class Game {
         }
     }
 
-    public void handleAttack(Message attackerMessage, PlayerIndex attacker, Point point) {
+    public void handleAttack(ActionMessage attackerMessage, PlayerIndex attacker, Point point) {
         PlayerIndex opponent = attacker == PlayerIndex.PLAYER_1 ? PlayerIndex.PLAYER_2 : PlayerIndex.PLAYER_1;
 
         Board opponentBoard = boards.get(opponent);
         Board.AttackResult result = opponentBoard.attack(point);
 
         try {
-            Server.getInstance().getSocket(attacker).send(attackerMessage.respond(new GameAttackMessageResult(result)));
+            Server.getInstance().getSocket(attacker).send(new GameAttackResultMessage(attackerMessage.getCorrelationId(), result));
             Server.getInstance().getSocket(opponent).send(new GameUpdateOpponentMessage(result));
-            if (result.missed()) switchTurn(opponent);
+            if (result.missed) switchTurn(opponent);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

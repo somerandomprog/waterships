@@ -1,0 +1,6 @@
+<!ELEMENT AssemblyUpdateOpponentMessage (total)>
+        <!ELEMENT total (#PCDATA)>
+        <!ATTLIST AssemblyUpdateOpponentMessage
+                action CDATA #REQUIRED
+                correlationId CDATA #IMPLIED
+                >

@@ -3,18 +3,18 @@ package by.bsu.waterships.client.runnables;
 
 import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.shared.Constants;
-import by.bsu.waterships.shared.messages.*;
-import by.bsu.waterships.shared.types.Message;
-import by.bsu.waterships.shared.types.MessageCode;
-import by.bsu.waterships.shared.types.MessageResult;
+import by.bsu.waterships.shared.protocol.ActionMessage;
+import by.bsu.waterships.shared.protocol.HandshakeMessage;
+import by.bsu.waterships.shared.protocol.results.ActionResultMessage;
 import by.bsu.waterships.shared.utils.ThrowableUtils;
+import by.bsu.waterships.shared.utils.XmlUtils;
 import javafx.application.Platform;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.*;
 
 public class Client extends Thread {
@@ -27,13 +27,13 @@ public class Client extends Thread {
     }
 
     public interface ClientCommandListener {
-        void onMessage(Message message) throws Exception;
+        void onMessage(ActionMessage message) throws Exception;
     }
 
     private static Client instance;
 
-    private final ConcurrentHashMap<String, Message> sourceMessages = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, CompletableFuture<MessageResult>> pendingMessages = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ActionMessage> sourceMessages = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, CompletableFuture<ActionResultMessage>> pendingMessages = new ConcurrentHashMap<>();
 
     private ClientListener listener;
     private ConcurrentLinkedQueue<ClientCommandListener> commandListeners = new ConcurrentLinkedQueue<>();
@@ -41,8 +41,8 @@ public class Client extends Thread {
     private boolean connected;
 
     private Socket socket;
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
+    private PrintStream output;
+    private Scanner input;
 
     private Client() {
     }
@@ -50,11 +50,11 @@ public class Client extends Thread {
     private Client(String host) {
         this.host = host;
         addCommandListener(message -> {
-            if (message.getCode() == MessageCode.PING) {
-                sendMessageWithoutResponse(message.respond(new PingMessageResult()));
-            } else if (message.getCode() == MessageCode.HANDSHAKE) {
-                GameState.getInstance().index = ((HandshakeMessage) message).index;
-                sendMessageWithoutResponse(new HandshakeMessageResult());
+            if (message.getAction().equals("ping")) {
+                sendMessageWithoutResponse(new ActionResultMessage("ping_result", message.getCorrelationId()));
+            } else if (message.getAction().equals("handshake")) {
+                GameState.getInstance().index = ((HandshakeMessage) message).getIndex();
+                sendMessageWithoutResponse(new ActionMessage("handshake_result"));
                 connected = true;
                 if (listener != null) Platform.runLater(() -> listener.onConnect());
             }
@@ -88,23 +88,33 @@ public class Client extends Thread {
         attempt(() -> {
             socket = new Socket(host, Constants.PORT);
             socket.setSoTimeout(Constants.KEEPALIVE_DELAY);
-            ois = new ObjectInputStream(socket.getInputStream());
-            oos = new ObjectOutputStream(socket.getOutputStream());
+            output = new PrintStream(socket.getOutputStream());
+            input = new Scanner(socket.getInputStream());
 
             System.out.println("initialized socket to " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    Message message = ThrowableUtils.nullIfThrows(() -> (Message) ois.readObject());
+                    String message = ThrowableUtils.nullIfThrows(() -> input.nextLine());
                     if (message == null) continue;
-                    if (message instanceof MessageResult && pendingMessages.containsKey(message.getCorrelationId())) {
-                        System.out.printf("[%s -> %s] %s\n", sourceMessages.get(message.getCorrelationId()).getCode(), message.getCode(), message);
-                        pendingMessages.get(message.getCorrelationId()).complete((MessageResult) message);
-                        pendingMessages.remove(message.getCorrelationId());
-                        sourceMessages.remove(message.getCorrelationId());
+                    if (!message.startsWith("@")) continue;
+                    String className = message.substring(1);
+                    String data = input.nextLine();
+                    XmlUtils.XmlResult parseResult = XmlUtils.unmarshal(className, data);
+                    if (!parseResult.success()) {
+                        System.err.println(className + ": " + data);
+                        System.err.println(parseResult.error());
+                    }
+
+                    ActionMessage parsedMessage = (ActionMessage) parseResult.data();
+                    if (parsedMessage instanceof ActionResultMessage && pendingMessages.containsKey(parsedMessage.getCorrelationId())) {
+                        System.out.printf("[%s -> %s] %s\n", sourceMessages.get(parsedMessage.getCorrelationId()).getAction(), parsedMessage.getAction(), message);
+                        pendingMessages.get(parsedMessage.getCorrelationId()).complete((ActionResultMessage) parsedMessage);
+                        pendingMessages.remove(parsedMessage.getCorrelationId());
+                        sourceMessages.remove(parsedMessage.getCorrelationId());
                     } else {
-                        System.out.printf("[%s] %s\n", message.getCode(), message);
+                        System.out.printf("[%s] %s\n", parsedMessage.getAction(), message);
                         for (ClientCommandListener commandListener : commandListeners)
-                            commandListener.onMessage(message);
+                            commandListener.onMessage(parsedMessage);
                     }
                 }
             } catch (InterruptedException e) {
@@ -120,7 +130,7 @@ public class Client extends Thread {
     public void disconnect() {
         if (!connected) return;
         attempt(() -> {
-            sendMessageWithoutResponse(new DisconnectMessage());
+            sendMessageWithoutResponse(new ActionMessage("disconnect"));
             connected = false;
             cleanup();
             if (listener != null) listener.onDisconnect();
@@ -130,12 +140,9 @@ public class Client extends Thread {
 
     private void cleanup() {
         try {
-            if (oos != null) oos.close();
-            if (ois != null) ois.close();
+            if (output != null) output.close();
+            if (input != null) input.close();
             if (socket != null && !socket.isClosed()) socket.close();
-
-            oos = null;
-            ois = null;
             socket = null;
         } catch (Exception e) {
             System.err.println("failed to cleanup Client");
@@ -143,13 +150,14 @@ public class Client extends Thread {
         }
     }
 
-    public MessageResult sendMessage(Message message) throws InterruptedException {
-        CompletableFuture<MessageResult> future = new CompletableFuture<>();
+    public ActionResultMessage sendMessage(ActionMessage message) throws InterruptedException {
+        CompletableFuture<ActionResultMessage> future = new CompletableFuture<>();
         pendingMessages.put(message.getCorrelationId(), future);
         sourceMessages.put(message.getCorrelationId(), message);
 
         try {
-            oos.writeObject(message);
+            output.println("@" + message.getClass().getSimpleName());
+            output.println((String) XmlUtils.marshal(message).data());
             return future.get(Constants.KEEPALIVE_DELAY, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw e;
@@ -162,8 +170,11 @@ public class Client extends Thread {
         }
     }
 
-    public void sendMessageWithoutResponse(Message message) {
-        attempt(() -> oos.writeObject(message));
+    public void sendMessageWithoutResponse(ActionMessage message) {
+        attempt(() -> {
+            output.println("@" + message.getClass().getSimpleName());
+            output.println((String) XmlUtils.marshal(message).data());
+        });
     }
 
     private void attempt(ThrowableUtils.ThrowableRunnable action) {

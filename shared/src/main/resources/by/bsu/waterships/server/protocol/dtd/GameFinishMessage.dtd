@@ -1,0 +1,6 @@
+<!ELEMENT GameFinishMessage EMPTY>
+        <!ATTLIST GameFinishMessage
+                action CDATA #REQUIRED
+                correlationId CDATA #IMPLIED
+                winner (PLAYER_1 | PLAYER_2) #REQUIRED
+                >

@@ -1,8 +1,5 @@
 package by.bsu.waterships.server.runnables;
 
-import by.bsu.waterships.shared.messages.game.GameFinishMessage;
-import by.bsu.waterships.shared.types.PlayerIndex;
-
 import java.util.Scanner;
 
 public class ServerStopListener extends Thread {

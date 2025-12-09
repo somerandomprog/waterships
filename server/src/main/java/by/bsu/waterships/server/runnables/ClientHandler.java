@@ -1,19 +1,14 @@
 package by.bsu.waterships.server.runnables;
 
 import by.bsu.waterships.shared.Constants;
-import by.bsu.waterships.shared.messages.*;
-import by.bsu.waterships.shared.messages.assembly.AssemblyPlacedShipMessage;
-import by.bsu.waterships.shared.messages.assembly.AssemblyReadyMessage;
-import by.bsu.waterships.shared.messages.assembly.AssemblyUpdateOpponentMessage;
-import by.bsu.waterships.shared.messages.game.GameAttackMessage;
-import by.bsu.waterships.shared.messages.introduction.IntroductionSubmitProgressMessageResult;
-import by.bsu.waterships.shared.messages.introduction.IntroductionUpdateOpponentMessage;
+import by.bsu.waterships.shared.protocol.*;
+import by.bsu.waterships.shared.protocol.results.ActionResultMessage;
+import by.bsu.waterships.shared.protocol.results.IntroductionSubmitProgressResultMessage;
 import by.bsu.waterships.shared.types.*;
 import by.bsu.waterships.shared.utils.ThrowableUtils;
+import by.bsu.waterships.shared.utils.XmlUtils;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.net.SocketException;
@@ -59,23 +54,23 @@ public class ClientHandler extends Thread {
                 try {
                     if (message == null) throw new Exception("no message received");
                     if (!message.startsWith("@")) throw new Exception("message didn't start with \"@\"");
-                    String[] split = message.substring(1).split(";");
-                    if(split.length != 2) throw new Exception("invalid initial payload format: required @class;length");
 
+                    String className = message.substring(1);
                     String data = input.nextLine();
-                    boolean shouldDisconnect = handleMessage(message);
+                    XmlUtils.XmlResult parseResult = XmlUtils.unmarshal(className, data);
+                    if (!parseResult.success()) throw new Exception(parseResult.error());
+
+                    boolean shouldDisconnect = handleMessage((ActionMessage) parseResult.data());
                     if (shouldDisconnect) break;
-                }
-                catch(Exception e) {
+                } catch (Exception e) {
                     System.out.println("pinging [" + (index.ordinal() + 1) + "]: " + e.getMessage());
                     try {
-                        send(new PingMessage());
+                        send(new ActionMessage("ping"));
                         retryAttempts--;
                         socket.setSoTimeout(Constants.KEEPALIVE_DELAY * (Constants.KEEPALIVE_RETRY_ATTEMPTS - retryAttempts));
                         if (retryAttempts < Constants.KEEPALIVE_RETRY_ATTEMPTS - 1)
                             System.out.printf("[%d] seems to be disconnected, %d attempt(s) remaining. new timeout: %d ms\n", index.ordinal() + 1, retryAttempts, socket.getSoTimeout());
                         if (retryAttempts == 0) break;
-                        continue;
                     } catch (Exception ignored) {
                         break;
                     }
@@ -88,73 +83,67 @@ public class ClientHandler extends Thread {
         }
     }
 
-    private void printMessage(Message message, boolean fromServer) {
+    private void printMessage(ActionMessage message, boolean fromServer) {
         String prefix = "[" + (fromServer ? "server" : index.ordinal() + 1) + " -> " + (fromServer ? index
                 .ordinal() + 1 : "server") + "]";
-        System.out.printf("%s %s: %s\n", prefix, message.getCode().name(), message);
+        System.out.printf("%s %s: %s\n", prefix, message.getAction(), message);
     }
 
-    public void send(Message message) throws IOException {
+    public void send(ActionMessage message) throws IOException {
         printMessage(message, true);
-        oos.writeObject(message);
+        output.println("@" + message.getClass().getSimpleName());
+        output.println((String) XmlUtils.marshal(message).data());
     }
 
-    private boolean handleMessage(Message message) {
+    private boolean handleMessage(ActionMessage message) {
         assert message != null;
         printMessage(message, false);
 
-        if (message.getCode() == MessageCode.DISCONNECT) return true;
-        else if (message.getCode() == MessageCode.RESULT) {
-            switch (message) {
-                case PingMessageResult pmr: {
-                    retryAttempts = Constants.KEEPALIVE_RETRY_ATTEMPTS;
-                    try {
-                        socket.setSoTimeout(Constants.KEEPALIVE_DELAY);
-                    } catch (SocketException ignored) {
-                    }
-                    return false;
+        switch (message.getAction()) {
+            case "disconnect":
+                return true;
+            case "ping_result": {
+                retryAttempts = Constants.KEEPALIVE_RETRY_ATTEMPTS;
+                try {
+                    socket.setSoTimeout(Constants.KEEPALIVE_DELAY);
+                } catch (SocketException ignored) {
                 }
-                case HandshakeMessageResult hsmr: {
-                    if (listener != null) listener.onConnectionEstablished();
-                    return false;
+                return false;
+            }
+            case "introduction_submit_progress_result": {
+                try {
+                    getOpponentHandler().send(new IntroductionUpdateOpponentMessage(((IntroductionSubmitProgressResultMessage) message).info));
+                } catch (IOException ignored) {
                 }
-                case IntroductionSubmitProgressMessageResult sipmr: {
-                    try {
-                        getOpponentHandler().send(new IntroductionUpdateOpponentMessage(sipmr.info));
-                    } catch (IOException ignored) {
-                    }
-                    return false;
-                }
-                default:
-                    return false;
+                return false;
             }
         }
 
         try {
-            switch (message.getCode()) {
-                case PING: {
-                    send(message.respond(new PingMessageResult()));
+            switch (message.getAction()) {
+                case "ping": {
+                    send(new ActionResultMessage("ping_result", message.getCorrelationId()));
                     break;
                 }
 
                 // assembly
-                case ASSEMBLY_PLACE_SHIP: {
+                case "assembly_place_ship": {
                     int total = ((AssemblyPlacedShipMessage) message).total;
                     getOpponentHandler().send(new AssemblyUpdateOpponentMessage(total));
                     break;
                 }
-                case ASSEMBLY_READY: {
+                case "assembly_ready": {
                     Board board = ((AssemblyReadyMessage) message).board;
                     Server.getInstance().getCurrentSession().playerAssembledBoard(index, board);
                     break;
                 }
 
                 // game
-                case GAME_READY: {
+                case "game_ready": {
                     Server.getInstance().getCurrentSession().playerReady(index);
                     break;
                 }
-                case GAME_ATTACK: {
+                case "game_attack": {
                     Point point = ((GameAttackMessage) message).where;
                     Server.getInstance().getCurrentSession().handleAttack(message, index, point);
                     break;
@@ -171,8 +160,8 @@ public class ClientHandler extends Thread {
     private void disconnect() {
         if (disconnected) return;
         try {
-            if (oos != null) oos.close();
-            if (ois != null) ois.close();
+            if (output != null) output.close();
+            if (input != null) input.close();
             socket.close();
             System.out.println("disconnected client at " + socket.getInetAddress().getHostAddress());
         } catch (Exception e) {

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:simpleType name="PlayerIndexType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="PLAYER_1"/>
+            <xs:enumeration value="PLAYER_2"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="ActionMessageType">
+        <xs:attribute name="action" type="xs:string" use="required"/>
+        <xs:attribute name="correlationId" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:attributeGroup name="ActionMessageAttributes">
+        <xs:attribute name="action" type="xs:string" use="required"/>
+        <xs:attribute name="correlationId" type="xs:string"/>
+    </xs:attributeGroup>
+
+    <xs:element name="HandshakeMessage">
+        <xs:complexType>
+            <xs:attributeGroup ref="ActionMessageAttributes"/>
+            <xs:attribute name="index" type="PlayerIndexType" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

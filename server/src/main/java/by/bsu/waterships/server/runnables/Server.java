@@ -3,9 +3,7 @@ package by.bsu.waterships.server.runnables;
 import by.bsu.waterships.server.logic.Game;
 import by.bsu.waterships.server.logic.GameState;
 import by.bsu.waterships.shared.Constants;
-import by.bsu.waterships.shared.messages.InterruptMessage;
-import by.bsu.waterships.shared.messages.introduction.IntroductionStartMessage;
-import by.bsu.waterships.shared.types.Message;
+import by.bsu.waterships.shared.protocol.ActionMessage;
 import by.bsu.waterships.shared.types.PlayerIndex;
 import by.bsu.waterships.shared.utils.ThrowableUtils;
 
@@ -65,7 +63,7 @@ public class Server implements Runnable {
 
                         if (currentSession == null) return;
                         if (currentSession.getState() != GameState.WAITING_FOR_PLAYERS && currentSession.getState() != GameState.END)
-                            broadcast(new InterruptMessage());
+                            broadcast(new ActionMessage("interrupt"));
 
                         boolean sessionVoided = handlers.isEmpty() || (handlers.size() == 1 && currentSession.getState() != GameState.WAITING_FOR_PLAYERS && currentSession.getState() != GameState.END);
                         if (sessionVoided) {
@@ -81,7 +79,7 @@ public class Server implements Runnable {
                         if (handlers.size() == 2) {
                             System.out.println("beginning introduction");
                             currentSession.setState(GameState.INTRODUCTION);
-                            broadcast(new IntroductionStartMessage(Constants.INTRODUCTION_DURATION_SECONDS));
+                            broadcast(new ActionMessage("introduction_start"));
                         }
                     }
                 });
@@ -94,7 +92,7 @@ public class Server implements Runnable {
         }
     }
 
-    public void broadcast(Message message) {
+    public <T extends ActionMessage> void broadcast(T message) {
         for (ClientHandler handler : handlers) {
             try {
                 handler.send(message);

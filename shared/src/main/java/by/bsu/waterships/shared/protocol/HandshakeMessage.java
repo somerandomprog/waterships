@@ -2,7 +2,7 @@ package by.bsu.waterships.shared.protocol;
 
 import by.bsu.waterships.shared.types.PlayerIndex;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 
 @XmlRootElement(name = "HandshakeMessage")
 @XmlAccessorType(XmlAccessType.FIELD)

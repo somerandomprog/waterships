@@ -50,9 +50,15 @@ public class ClientHandler extends Thread {
             send(new HandshakeMessage(index));
 
             while (true) {
-                String message = ThrowableUtils.nullIfThrows(() -> input.nextLine());
                 try {
-                    if (message == null) throw new Exception("no message received");
+                    int timeSpent = 0;
+                    while(timeSpent <= socket.getSoTimeout()) {
+                        if(input.hasNextLine()) break;
+                        Thread.sleep(100);
+                        timeSpent += 100;
+                    }
+                    if (!input.hasNextLine()) throw new Exception("no message received");
+                    String message = ThrowableUtils.nullIfThrows(() -> input.nextLine());
                     if (!message.startsWith("@")) throw new Exception("message didn't start with \"@\"");
 
                     String className = message.substring(1);

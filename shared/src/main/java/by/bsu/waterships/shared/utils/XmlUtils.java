@@ -6,10 +6,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,15 +31,16 @@ public class XmlUtils {
 
     public static <T> XmlResult marshal(T what) {
         String simpleName = what.getClass().getSimpleName();
-        if (XmlUtils.class.getResource("../protocol/xsd/" + simpleName + ".xsd") == null)
+        if (XmlUtils.class.getResource("/by/bsu/waterships/shared/protocol/xsd/" + simpleName + ".xsd") == null)
             return new XmlResult(false, "cannot marshal object of type " + simpleName + " since it's missing the XML-schema (.xsd) definition", null);
-        if (XmlUtils.class.getResource("../protocol/dtd/" + simpleName + ".dtd") == null)
+        if (XmlUtils.class.getResource("/by/bsu/waterships/shared/protocol/dtd/" + simpleName + ".dtd") == null)
             return new XmlResult(false, "cannot marshal object of type " + simpleName + " since it's missing the DTD (.dtd)", null);
 
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             JAXBContext context = JAXBContext.newInstance(what.getClass());
             Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.marshal(what, baos);
             baos.flush();
             return new XmlResult(true, null, baos.toString(StandardCharsets.UTF_8));
@@ -77,7 +78,7 @@ public class XmlUtils {
         Source xmlSource = new StreamSource(new StringReader(data));
 
         try {
-            Source schemaSource = new StreamSource(XmlUtils.class.getResourceAsStream("../protocol/xsd/" + simpleName + ".xsd"));
+            Source schemaSource = new StreamSource(XmlUtils.class.getResourceAsStream("/by/bsu/waterships/shared/protocol/xsd/" + simpleName + ".xsd"));
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = schemaFactory.newSchema(schemaSource);
             Validator validator = schema.newValidator();
@@ -94,7 +95,7 @@ public class XmlUtils {
             domFactory.setNamespaceAware(true);
 
             DocumentBuilder builder = domFactory.newDocumentBuilder();
-            builder.setEntityResolver((publicId, systemId) -> new InputSource(XmlUtils.class.getResourceAsStream("../protocol/dtd/" + simpleName + ".dtd")));
+            builder.setEntityResolver((publicId, systemId) -> new InputSource(XmlUtils.class.getResourceAsStream("/by/bsu/waterships/shared/protocol/dtd/" + simpleName + ".dtd")));
 
             List<String> errors = new ArrayList<>();
             builder.setErrorHandler(new ErrorHandler() {

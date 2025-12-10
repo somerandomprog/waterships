@@ -94,11 +94,13 @@ public class Client extends Thread {
             System.out.println("initialized socket to " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
             try {
                 while (!Thread.currentThread().isInterrupted()) {
+                    if(!input.hasNextLine()) continue;
                     String message = ThrowableUtils.nullIfThrows(() -> input.nextLine());
-                    if (message == null) continue;
+                    System.out.println(message);
                     if (!message.startsWith("@")) continue;
                     String className = message.substring(1);
                     String data = input.nextLine();
+                    System.out.println(data);
                     XmlUtils.XmlResult parseResult = XmlUtils.unmarshal(className, data);
                     if (!parseResult.success()) {
                         System.err.println(className + ": " + data);

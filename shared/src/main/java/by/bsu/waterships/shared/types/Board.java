@@ -3,7 +3,7 @@ package by.bsu.waterships.shared.types;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 
 @XmlRootElement(name = "Board")
 @XmlAccessorType(XmlAccessType.FIELD)

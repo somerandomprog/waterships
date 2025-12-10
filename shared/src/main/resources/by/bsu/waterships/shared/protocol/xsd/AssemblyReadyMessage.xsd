@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:complexType name="PointType">
+        <xs:attribute name="x" type="xs:int" use="required"/>
+        <xs:attribute name="y" type="xs:int" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="ShipType">
+        <xs:sequence>
+            <xs:element name="index" type="xs:int"/>
+            <xs:element name="length" type="xs:int"/>
+            <xs:element name="start" type="PointType"/>
+            <xs:element name="vertical" type="xs:boolean"/>
+            <xs:element name="destroyed" type="xs:boolean"/>
+            <xs:element name="Points" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="ShipPoint" type="PointType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BoardType">
+        <xs:sequence>
+            <xs:element name="Ships" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Ship" type="ShipType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="Destroyed" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Point" type="PointType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="Missed" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Point" type="PointType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="AssemblyReadyMessage">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Board" type="BoardType"/>
+            </xs:sequence>
+            <xs:attribute name="action" type="xs:string" use="required"/>
+            <xs:attribute name="correlationId" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

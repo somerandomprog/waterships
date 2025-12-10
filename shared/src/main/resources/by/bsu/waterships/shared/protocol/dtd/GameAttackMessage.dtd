@@ -1,0 +1,12 @@
+<!ELEMENT GameAttackMessage (where)>
+
+        <!ELEMENT where EMPTY>
+        <!ATTLIST where
+                x CDATA #REQUIRED
+                y CDATA #REQUIRED
+                >
+
+        <!ATTLIST GameAttackMessage
+                action CDATA #REQUIRED
+                correlationId CDATA #IMPLIED
+                >

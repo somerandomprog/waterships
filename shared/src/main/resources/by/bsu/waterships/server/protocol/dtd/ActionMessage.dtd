@@ -1,5 +1,0 @@
-<!ELEMENT ActionMessage EMPTY>
-        <!ATTLIST ActionMessage
-                action CDATA #REQUIRED
-                correlationId CDATA #IMPLIED
-                >

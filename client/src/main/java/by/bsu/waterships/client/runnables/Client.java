@@ -156,7 +156,7 @@ public class Client extends Thread {
         sourceMessages.put(message.getCorrelationId(), message);
 
         try {
-            output.println("@" + message.getClass().getSimpleName());
+            output.println("@" + message.getClass().getName());
             output.println((String) XmlUtils.marshal(message).data());
             return future.get(Constants.KEEPALIVE_DELAY, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -172,7 +172,7 @@ public class Client extends Thread {
 
     public void sendMessageWithoutResponse(ActionMessage message) {
         attempt(() -> {
-            output.println("@" + message.getClass().getSimpleName());
+            output.println("@" + message.getClass().getName());
             output.println((String) XmlUtils.marshal(message).data());
         });
     }

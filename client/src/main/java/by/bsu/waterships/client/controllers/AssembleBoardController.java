@@ -4,13 +4,13 @@ import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.client.state.Resources;
 import by.bsu.waterships.client.state.SceneController;
-import by.bsu.waterships.shared.messages.assembly.AssemblyPlacedShipMessage;
-import by.bsu.waterships.shared.messages.assembly.AssemblyReadyMessage;
-import by.bsu.waterships.shared.messages.assembly.AssemblyUpdateOpponentMessage;
+import by.bsu.waterships.shared.protocol.AssemblyPlacedShipMessage;
+import by.bsu.waterships.shared.protocol.AssemblyReadyMessage;
+import by.bsu.waterships.shared.protocol.AssemblyUpdateOpponentMessage;
 import by.bsu.waterships.shared.types.Board;
-import by.bsu.waterships.shared.types.MessageCode;
 import by.bsu.waterships.shared.types.Point;
 
+import by.bsu.waterships.shared.types.Ship;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -90,7 +90,7 @@ public class AssembleBoardController extends SceneController.WatershipsScene {
             int length = (int) ship.getUserData();
             int index = allShips.indexOf(ship);
             boolean isVertical = ship.getRotate() != 0;
-            board.addShip(new Board.Ship(index, new Point(col, row), length, isVertical));
+            board.addShip(new Ship(index, new Point(col, row), length, isVertical));
         }
         Client.getInstance().sendMessageWithoutResponse(new AssemblyReadyMessage(board));
     }
@@ -127,7 +127,10 @@ public class AssembleBoardController extends SceneController.WatershipsScene {
                 boardGrid.getChildren().remove(ship);
                 ship.setLayoutX(originalLocations.get(ship).getKey());
                 ship.setLayoutY(originalLocations.get(ship).getValue());
-                ship.setX(0); ship.setY(0); ship.setRotate(0); ship.setTranslateX(0);
+                ship.setX(0);
+                ship.setY(0);
+                ship.setRotate(0);
+                ship.setTranslateX(0);
                 shipsContainer.getChildren().add(ship);
             }
         }
@@ -142,16 +145,21 @@ public class AssembleBoardController extends SceneController.WatershipsScene {
         opponentImage.setImage(GameState.getInstance().opponentImage);
 
         commandListener = message -> {
-            if (message.getCode() == MessageCode.ASSEMBLY_UPDATE_OPPONENT) {
-                int total = ((AssemblyUpdateOpponentMessage) message).total;
-                Platform.runLater(() -> opponentProgress.setText(total + "/10"));
-            } else if (message.getCode() == MessageCode.GAME_BEGIN) {
-                Platform.runLater(() -> {
-                    SnapshotParameters sp = new SnapshotParameters();
-                    sp.setFill(Color.TRANSPARENT);
-                    GameState.getInstance().shipsSnapshot = boardGrid.snapshot(sp, null);
-                    SceneController.getInstance().activate(SceneController.GAME_SCENE);
-                });
+            switch (message.getAction()) {
+                case "assembly_update_opponent": {
+                    int total = ((AssemblyUpdateOpponentMessage) message).total;
+                    Platform.runLater(() -> opponentProgress.setText(total + "/10"));
+                    break;
+                }
+                case "game_begin": {
+                    Platform.runLater(() -> {
+                        SnapshotParameters sp = new SnapshotParameters();
+                        sp.setFill(Color.TRANSPARENT);
+                        GameState.getInstance().shipsSnapshot = boardGrid.snapshot(sp, null);
+                        SceneController.getInstance().activate(SceneController.GAME_SCENE);
+                    });
+                    break;
+                }
             }
         };
         Client.getInstance().addCommandListener(commandListener);

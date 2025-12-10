@@ -1,6 +1,0 @@
-<!ELEMENT AssemblyPlacedShipMessage (total)>
-        <!ELEMENT total (#PCDATA)>
-        <!ATTLIST AssemblyPlacedShipMessage
-                action CDATA #REQUIRED
-                correlationId CDATA #IMPLIED
-                >

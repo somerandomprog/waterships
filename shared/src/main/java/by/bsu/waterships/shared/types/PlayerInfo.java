@@ -10,10 +10,10 @@ import javax.xml.bind.annotation.XmlType;
 public class PlayerInfo {
 
     @XmlElement(required = true)
-    private byte[] image;
+    public byte[] image;
 
     @XmlElement(required = true)
-    private String name;
+    public String name;
 
     public PlayerInfo() {
     }

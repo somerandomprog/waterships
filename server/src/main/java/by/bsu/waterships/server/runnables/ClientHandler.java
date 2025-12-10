@@ -91,8 +91,14 @@ public class ClientHandler extends Thread {
 
     public void send(ActionMessage message) throws IOException {
         printMessage(message, true);
-        output.println("@" + message.getClass().getSimpleName());
-        output.println((String) XmlUtils.marshal(message).data());
+        XmlUtils.XmlResult result = XmlUtils.marshal(message);
+        if (!result.success()) {
+            System.err.println(message);
+            System.err.println(result.error());
+            return;
+        }
+        output.println("@" + message.getClass().getName());
+        output.println((String) result.data());
     }
 
     private boolean handleMessage(ActionMessage message) {

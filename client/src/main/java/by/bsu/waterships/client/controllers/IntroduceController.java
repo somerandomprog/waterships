@@ -5,9 +5,8 @@ import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.client.state.Resources;
 import by.bsu.waterships.client.state.SceneController;
 import by.bsu.waterships.shared.Constants;
-import by.bsu.waterships.shared.messages.introduction.IntroductionSubmitProgressMessageResult;
-import by.bsu.waterships.shared.messages.introduction.IntroductionUpdateOpponentMessage;
-import by.bsu.waterships.shared.types.MessageCode;
+import by.bsu.waterships.shared.protocol.IntroductionUpdateOpponentMessage;
+import by.bsu.waterships.shared.protocol.results.IntroductionSubmitProgressResultMessage;
 import by.bsu.waterships.shared.types.PlayerInfo;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
@@ -33,6 +32,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Objects;
 
 public class IntroduceController extends SceneController.WatershipsScene {
     @FXML
@@ -78,7 +78,7 @@ public class IntroduceController extends SceneController.WatershipsScene {
         Resources.SFX.PAPER_SFX.play();
 
         listener = message -> {
-            if (message.getCode() == MessageCode.INTRODUCTION_SUBMIT_PROGRESS) {
+            if (message.getAction() == "introduction_submit_progress") {
                 Platform.runLater(() -> {
                     try {
                         SnapshotParameters sp = new SnapshotParameters();
@@ -88,7 +88,8 @@ public class IntroduceController extends SceneController.WatershipsScene {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         ImageIO.write(rimage, "png", baos);
                         Client.getInstance().sendMessageWithoutResponse(
-                                new IntroductionSubmitProgressMessageResult(
+                                new IntroductionSubmitProgressResultMessage(
+                                        message.getCorrelationId(),
                                         new PlayerInfo(baos.toByteArray(), nameField.getText())
                                 )
                         );
@@ -97,13 +98,13 @@ public class IntroduceController extends SceneController.WatershipsScene {
 
                     }
                 });
-            } else if (message.getCode() == MessageCode.INTRODUCTION_UPDATE_OPPONENT) {
+            } else if (message.getAction().equals("introduction_update_opponent")) {
                 IntroductionUpdateOpponentMessage uoim = (IntroductionUpdateOpponentMessage) message;
                 Platform.runLater(() -> {
-                    opponentImageView.setImage(new Image(new ByteArrayInputStream((uoim.info.image()))));
-                    opponentName.setText(uoim.info.name());
+                    opponentImageView.setImage(new Image(new ByteArrayInputStream((uoim.getInfo().image))));
+                    opponentName.setText(uoim.getInfo().name);
                 });
-            } else if (message.getCode() == MessageCode.INTRODUCTION_END) {
+            } else if (Objects.equals(message.getAction(), "introduction_end")) {
                 GameState state = GameState.getInstance();
                 state.meName = nameField.getText();
                 state.meImage = _lastRenderedImage;

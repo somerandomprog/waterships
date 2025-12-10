@@ -4,7 +4,6 @@ import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.client.state.Resources;
 import by.bsu.waterships.client.state.SceneController;
-import by.bsu.waterships.shared.types.MessageCode;
 import by.bsu.waterships.shared.types.PlayerIndex;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -28,12 +27,12 @@ public class WaitController extends SceneController.WatershipsScene {
         Resources.SFX.NOTIFICATION_SFX.play();
 
         listener = message -> {
-            if (message.getCode() == MessageCode.INTRODUCTION_START)
+            if (message.getAction().equals("introduction_start"))
                 Platform.runLater(() -> SceneController.getInstance().activate(SceneController.INTRODUCE_SCENE));
         };
         Client.getInstance().addCommandListener(listener);
 
-        if(GameState.getInstance().index == PlayerIndex.PLAYER_1) {
+        if (GameState.getInstance().index == PlayerIndex.PLAYER_1) {
             Platform.runLater(() -> {
                 statusLabel.setManaged(false);
                 statusLabel.setVisible(false);

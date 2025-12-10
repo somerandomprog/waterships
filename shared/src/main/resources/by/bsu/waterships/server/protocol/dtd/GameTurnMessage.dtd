@@ -1,6 +1,0 @@
-<!ELEMENT GameTurnMessage EMPTY>
-        <!ATTLIST GameTurnMessage
-                action CDATA #REQUIRED
-                correlationId CDATA #IMPLIED
-                player (PLAYER_1 | PLAYER_2) #REQUIRED
-                >

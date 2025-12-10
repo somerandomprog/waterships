@@ -3,7 +3,6 @@ package by.bsu.waterships.client.controllers;
 import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.Resources;
 import by.bsu.waterships.client.state.SceneController;
-import by.bsu.waterships.shared.types.MessageCode;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -66,9 +65,9 @@ public class ConnectToServerController extends SceneController.WatershipsScene {
         });
         // this may happen immediately after connecting
         client.addCommandListener(message -> {
-            if (message.getCode() == MessageCode.INTRODUCTION_START)
+            if (message.getAction().equals("introduction_start"))
                 Platform.runLater(() -> SceneController.getInstance().activate(SceneController.INTRODUCE_SCENE));
-            else if (message.getCode() == MessageCode.INTERRUPT)
+            else if (message.getAction().equals("interrupt"))
                 Platform.runLater(() -> SceneController.getInstance().activate(SceneController.INTERRUPTED_SCENE));
         });
         client.start();

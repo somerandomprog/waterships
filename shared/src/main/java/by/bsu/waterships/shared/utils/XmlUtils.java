@@ -32,9 +32,9 @@ public class XmlUtils {
     public static <T> XmlResult marshal(T what) {
         String simpleName = what.getClass().getSimpleName();
         if (XmlUtils.class.getResource("../protocol/xsd/" + simpleName + ".xsd") == null)
-            return new XmlResult(false, "cannot marshal object of type " + simpleName + "since it's missing the XML-schema (.xsd) definition", null);
+            return new XmlResult(false, "cannot marshal object of type " + simpleName + " since it's missing the XML-schema (.xsd) definition", null);
         if (XmlUtils.class.getResource("../protocol/dtd/" + simpleName + ".dtd") == null)
-            return new XmlResult(false, "cannot marshal object of type " + simpleName + "since it's missing the DTD (.dtd)", null);
+            return new XmlResult(false, "cannot marshal object of type " + simpleName + " since it's missing the DTD (.dtd)", null);
 
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

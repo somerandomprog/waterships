@@ -4,7 +4,8 @@ import by.bsu.waterships.client.runnables.Client;
 import by.bsu.waterships.client.state.GameState;
 import by.bsu.waterships.client.state.Resources;
 import by.bsu.waterships.client.state.SceneController;
-import by.bsu.waterships.shared.messages.game.*;
+import by.bsu.waterships.shared.protocol.*;
+import by.bsu.waterships.shared.protocol.results.GameAttackResultMessage;
 import by.bsu.waterships.shared.types.Board;
 import by.bsu.waterships.shared.types.PlayerIndex;
 import by.bsu.waterships.shared.types.Point;
@@ -18,6 +19,8 @@ import javafx.scene.effect.ColorInput;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+
+import java.util.UUID;
 
 public class GameController extends SceneController.WatershipsScene {
     @FXML
@@ -69,13 +72,13 @@ public class GameController extends SceneController.WatershipsScene {
         for (Node n : opponentShipsContainer.getChildren()) n.setEffect(null);
 
         listener = message -> {
-            switch (message.getCode()) {
-                case GAME_TURN: {
+            switch (message.getAction()) {
+                case "game_turn": {
                     PlayerIndex player = ((GameTurnMessage) message).player;
                     Platform.runLater(() -> switchTurn(player == GameState.getInstance().index));
                     break;
                 }
-                case GAME_FINISH: {
+                case "game_finish": {
                     GameState.getInstance().winnerIndex = ((GameFinishMessage) message).winner;
                     Platform.runLater(() -> {
                         theEndBanner.setVisible(true);
@@ -93,26 +96,26 @@ public class GameController extends SceneController.WatershipsScene {
                     });
                     break;
                 }
-                case GAME_UPDATE_OPPONENT: {
+                case "game_update_opponent": {
                     Board.AttackResult result = ((GameUpdateOpponentMessage) message).result;
                     Platform.runLater(() -> {
                         // do not add idle points here
-                        setCell(meGrid, result.point(), !result.missed());
-                        for (Point p : result.idlePoints()) setCell(meGrid, p, false);
-                        if (result.destroyedShip() != null) {
-                            ImageView destroyedShip = (ImageView) meShipsContainer.getChildren().get(result.destroyedShip().index);
+                        setCell(meGrid, result.point, !result.missed);
+                        for (Point p : result.idlePoints) setCell(meGrid, p, false);
+                        if (result.destroyedShip != null) {
+                            ImageView destroyedShip = (ImageView) meShipsContainer.getChildren().get(result.destroyedShip.index);
                             destroyedShip.setEffect(new Blend(BlendMode.SRC_ATOP, null, new ColorInput(0, 0, destroyedShip.getFitWidth(), destroyedShip.getFitHeight(), Color.web("#df2024"))));
                             Resources.SFX.SHIP_DESTROYED_SFX.play();
                         }
-                        if (result.missed()) Resources.SFX.MISS_SFX.play();
-                        else if (result.destroyedShip() == null) Resources.SFX.EXPLOSION_SFX.play();
+                        if (result.missed) Resources.SFX.MISS_SFX.play();
+                        else if (result.destroyedShip == null) Resources.SFX.EXPLOSION_SFX.play();
                     });
                     break;
                 }
             }
         };
         Client.getInstance().addCommandListener(listener);
-        Client.getInstance().sendMessageWithoutResponse(new GameReadyMessage());
+        Client.getInstance().sendMessageWithoutResponse(new ActionMessage("game_ready"));
 
         Resources.SFX.START_SFX.play();
     }
@@ -153,17 +156,17 @@ public class GameController extends SceneController.WatershipsScene {
                 if (opponentGrid.isDisabled() || !cell.getChildren().isEmpty()) return;
                 Point point = new Point(GridPane.getColumnIndex(cell), GridPane.getRowIndex(cell));
                 try {
-                    Board.AttackResult result = ((GameAttackMessageResult) Client.getInstance().sendMessage(new GameAttackMessage(point))).result;
-                    for (Point idlePoint : result.idlePoints()) setCell(opponentGrid, idlePoint, false);
-                    setCell(opponentGrid, point, !result.missed());
-                    if (result.destroyedShip() != null) {
-                        ImageView destroyedShip = (ImageView) opponentShipsContainer.getChildren().get(result.destroyedShip().index);
+                    Board.AttackResult result = ((GameAttackResultMessage) Client.getInstance().sendMessage(new GameAttackMessage(UUID.randomUUID().toString(), point))).result;
+                    for (Point idlePoint : result.idlePoints) setCell(opponentGrid, idlePoint, false);
+                    setCell(opponentGrid, point, !result.missed);
+                    if (result.destroyedShip != null) {
+                        ImageView destroyedShip = (ImageView) opponentShipsContainer.getChildren().get(result.destroyedShip.index);
                         destroyedShip.setEffect(new Blend(BlendMode.SRC_ATOP, null, new ColorInput(0, 0, destroyedShip.getFitWidth(), destroyedShip.getFitHeight(), Color.web("#df2024"))));
                         Resources.SFX.SHIP_DESTROYED_SFX.play();
                     }
 
-                    if (result.missed()) Resources.SFX.MISS_SFX.play(0.75);
-                    else if (result.destroyedShip() == null) Resources.SFX.EXPLOSION_SFX.play(0.75);
+                    if (result.missed) Resources.SFX.MISS_SFX.play(0.75);
+                    else if (result.destroyedShip == null) Resources.SFX.EXPLOSION_SFX.play(0.75);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

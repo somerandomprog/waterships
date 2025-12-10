@@ -6,14 +6,14 @@ import by.bsu.waterships.shared.Constants;
 import by.bsu.waterships.shared.protocol.ActionMessage;
 import by.bsu.waterships.shared.protocol.HandshakeMessage;
 import by.bsu.waterships.shared.protocol.results.ActionResultMessage;
+import by.bsu.waterships.shared.utils.NullUtils;
 import by.bsu.waterships.shared.utils.ThrowableUtils;
 import by.bsu.waterships.shared.utils.XmlUtils;
 import javafx.application.Platform;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.concurrent.*;
 
@@ -41,8 +41,8 @@ public class Client extends Thread {
     private boolean connected;
 
     private Socket socket;
-    private PrintStream output;
-    private Scanner input;
+    private DataOutputStream output;
+    private DataInputStream input;
 
     private Client() {
     }
@@ -88,35 +88,23 @@ public class Client extends Thread {
         attempt(() -> {
             socket = new Socket(host, Constants.PORT);
             socket.setSoTimeout(Constants.KEEPALIVE_DELAY);
-            output = new PrintStream(socket.getOutputStream());
-            input = new Scanner(socket.getInputStream());
+            output = new DataOutputStream(socket.getOutputStream());
+            input = new DataInputStream(socket.getInputStream());
 
             System.out.println("initialized socket to " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    if(!input.hasNextLine()) continue;
-                    String message = ThrowableUtils.nullIfThrows(() -> input.nextLine());
-                    System.out.println(message);
-                    if (!message.startsWith("@")) continue;
-                    String className = message.substring(1);
-                    String data = input.nextLine();
-                    System.out.println(data);
-                    XmlUtils.XmlResult parseResult = XmlUtils.unmarshal(className, data);
-                    if (!parseResult.success()) {
-                        System.err.println(className + ": " + data);
-                        System.err.println(parseResult.error());
-                    }
-
-                    ActionMessage parsedMessage = (ActionMessage) parseResult.data();
-                    if (parsedMessage instanceof ActionResultMessage && pendingMessages.containsKey(parsedMessage.getCorrelationId())) {
-                        System.out.printf("[%s -> %s] %s\n", sourceMessages.get(parsedMessage.getCorrelationId()).getAction(), parsedMessage.getAction(), message);
-                        pendingMessages.get(parsedMessage.getCorrelationId()).complete((ActionResultMessage) parsedMessage);
-                        pendingMessages.remove(parsedMessage.getCorrelationId());
-                        sourceMessages.remove(parsedMessage.getCorrelationId());
+                    ActionMessage message = ThrowableUtils.nullIfThrows(this::tryReceiveMessage);
+                    if (message == null) continue;
+                    if (message instanceof ActionResultMessage && pendingMessages.containsKey(message.getCorrelationId())) {
+                        System.out.printf("[%s -> %s] %s\n", sourceMessages.get(message.getCorrelationId()).getAction(), message.getAction(), message);
+                        pendingMessages.get(message.getCorrelationId()).complete((ActionResultMessage) message);
+                        pendingMessages.remove(message.getCorrelationId());
+                        sourceMessages.remove(message.getCorrelationId());
                     } else {
-                        System.out.printf("[%s] %s\n", parsedMessage.getAction(), message);
+                        System.out.printf("[%s] %s\n", message.getAction(), message);
                         for (ClientCommandListener commandListener : commandListeners)
-                            commandListener.onMessage(parsedMessage);
+                            commandListener.onMessage(message);
                     }
                 }
             } catch (InterruptedException e) {
@@ -127,6 +115,53 @@ public class Client extends Thread {
                 disconnect();
             }
         });
+    }
+
+    private ActionMessage tryReceiveMessage() throws IOException {
+        int classNameLength = input.readInt();
+        byte[] classNameBytes = new byte[classNameLength];
+        input.readFully(classNameBytes, 0, classNameLength);
+        String className = new String(classNameBytes, StandardCharsets.UTF_8);
+
+        int payloadLength = input.readInt();
+        byte[] payloadBytes = new byte[payloadLength];
+        input.readFully(payloadBytes, 0, payloadLength);
+        String payload = new String(payloadBytes, StandardCharsets.UTF_8);
+
+        System.out.printf("\t<< payloadLength: %d | className: %s\n", payloadLength, className);
+        if (!className.contains("IntroductionSubmitProgressResultMessage") && !className.contains("IntroductionUpdateOpponentMessage"))
+            System.out.println("\t" + payload);
+        else System.out.println("\t<< not outputting introduction payload (too long) >:(");
+
+        XmlUtils.XmlResult parseResult = XmlUtils.unmarshal(className, payload);
+        if (!parseResult.success()) {
+            System.err.println(parseResult.error());
+            return null;
+        }
+        return (ActionMessage) parseResult.data();
+    }
+
+    private void tryWriteMessage(ActionMessage message) throws IOException {
+        XmlUtils.XmlResult result = XmlUtils.marshal(message);
+        if (!result.success()) {
+            System.err.println(message);
+            System.err.println(result.error());
+            return;
+        }
+
+        String className = message.getClass().getName();
+        String payload = (String) result.data();
+
+        System.out.printf("\t>> payloadLength: %d | className: %s\n", payload.length(), className);
+        if (!className.contains("IntroductionUpdateOpponentMessage") && !className.contains("IntroductionSubmitProgressResultMessage"))
+            System.out.println("\t" + payload);
+        else System.out.println("\t>> not outputting introduction payload (too long) >:(");
+
+        output.writeInt(className.length());
+        output.writeBytes(className);
+        output.writeInt(payload.length());
+        output.writeBytes(payload);
+        output.flush();
     }
 
     public void disconnect() {
@@ -158,8 +193,7 @@ public class Client extends Thread {
         sourceMessages.put(message.getCorrelationId(), message);
 
         try {
-            output.println("@" + message.getClass().getName());
-            output.println((String) XmlUtils.marshal(message).data());
+            tryWriteMessage(message);
             return future.get(Constants.KEEPALIVE_DELAY, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw e;
@@ -173,10 +207,7 @@ public class Client extends Thread {
     }
 
     public void sendMessageWithoutResponse(ActionMessage message) {
-        attempt(() -> {
-            output.println("@" + message.getClass().getName());
-            output.println((String) XmlUtils.marshal(message).data());
-        });
+        attempt(() -> tryWriteMessage(message));
     }
 
     private void attempt(ThrowableUtils.ThrowableRunnable action) {

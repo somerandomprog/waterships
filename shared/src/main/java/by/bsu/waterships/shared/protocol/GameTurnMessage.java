@@ -13,11 +13,11 @@ public class GameTurnMessage extends ActionMessage {
     public PlayerIndex player;
 
     public GameTurnMessage() {
-        super("game_finish");
+        super("game_turn");
     }
 
     public GameTurnMessage(PlayerIndex player) {
-        super("game_finish");
+        super("game_turn");
         this.player = player;
     }
 }

@@ -16,7 +16,7 @@ public class GameAttackResultMessage extends ActionResultMessage {
         super("game_attack_result", null);
     }
 
-    public GameAttackResultMessage(String correlationId, Board.AttackResult result) {
+    public GameAttackResultMessage(Board.AttackResult result, String correlationId) {
         super("game_attack_result", correlationId);
         this.result = result;
     }

@@ -1,30 +1,32 @@
 package by.bsu.waterships.shared.types;
 
 import jakarta.xml.bind.annotation.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "Ship")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = {"index", "length", "start", "vertical", "destroyed", "points"})
+@XmlType(propOrder = {"start", "points"})
 public class Ship {
 
-    @XmlElement(required = true)
+    @XmlAttribute(required = true)
     public int index;
 
-    @XmlElement(required = true)
+    @XmlAttribute(required = true)
     public int length;
+
+    @XmlAttribute(required = true)
+    public boolean vertical;
+
+    @XmlAttribute(required = true)
+    public boolean destroyed = false;
 
     @XmlElement(required = true)
     public Point start;
 
-    @XmlElement(required = true)
-    public boolean vertical;
-
-    @XmlElement(required = true)
-    public boolean destroyed = false;
-
-    @XmlElement(name = "ShipPoint")
+    @XmlElementWrapper(name = "points") // Creates the <Points> container
+    @XmlElement(name = "ShipPoint")     // Creates <ShipPoint> items inside
     public final List<Point> points = new ArrayList<>();
 
     public Ship() {

@@ -10,25 +10,26 @@
                 y CDATA #REQUIRED
                 >
 
-        <!ELEMENT index (#PCDATA)>
-        <!ELEMENT length (#PCDATA)>
-        <!ELEMENT start EMPTY>
-        <!ATTLIST start
-                x CDATA #REQUIRED
-                y CDATA #REQUIRED
-                >
-        <!ELEMENT vertical (#PCDATA)>
-        <!ELEMENT destroyed (#PCDATA)>
-        <!ELEMENT Points (ShipPoint*)>
-
-        <!ELEMENT Ship (index, length, start, vertical, destroyed, Points)>
-
         <!ELEMENT IdlePoints (IdlePoint*)>
         <!ELEMENT IdlePoint EMPTY>
         <!ATTLIST IdlePoint
                 x CDATA #REQUIRED
                 y CDATA #REQUIRED
                 >
+
+        <!ELEMENT DestroyedShip (start, points)>
+        <!ATTLIST DestroyedShip
+                index CDATA #REQUIRED
+                length CDATA #REQUIRED
+                vertical CDATA #REQUIRED
+                destroyed CDATA #REQUIRED
+                >
+        <!ELEMENT start EMPTY>
+        <!ATTLIST start
+                x CDATA #REQUIRED
+                y CDATA #REQUIRED
+                >
+        <!ELEMENT points (ShipPoint*)>
 
         <!ELEMENT result (point, missed, DestroyedShip?, IdlePoints?)>
 
@@ -38,10 +39,9 @@
                 y CDATA #REQUIRED
                 >
         <!ELEMENT missed (#PCDATA)>
-        <!ELEMENT DestroyedShip (index, length, start, vertical, destroyed, Points)>
 
         <!ELEMENT GameUpdateOpponentMessage (result)>
         <!ATTLIST GameUpdateOpponentMessage
                 action CDATA #REQUIRED
-                correlationId CDATA #REQUIRED
+                correlationId CDATA #IMPLIED
                 >

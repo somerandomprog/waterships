@@ -1,18 +1,15 @@
 package by.bsu.waterships.shared.protocol;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.*;
 
 @XmlRootElement(name = "ActionMessage")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ActionMessage {
     @XmlAttribute(required = true)
-    private String action;
+    protected String action;
 
     @XmlAttribute
-    private String correlationId;
+    protected String correlationId;
 
     public ActionMessage() {
     }
@@ -41,5 +38,13 @@ public class ActionMessage {
 
     public void setCorrelationId(String correlationId) {
         this.correlationId = correlationId;
+    }
+
+    @Override
+    public String toString() {
+        return "ActionMessage{" +
+                "action='" + action + '\'' +
+                ", correlationId='" + correlationId + '\'' +
+                '}';
     }
 }

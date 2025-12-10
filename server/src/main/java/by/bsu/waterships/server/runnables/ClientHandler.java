@@ -8,11 +8,16 @@ import by.bsu.waterships.shared.types.*;
 import by.bsu.waterships.shared.utils.ThrowableUtils;
 import by.bsu.waterships.shared.utils.XmlUtils;
 
+import javax.swing.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class ClientHandler extends Thread {
     public interface ClientHandlerListener {
@@ -25,8 +30,8 @@ public class ClientHandler extends Thread {
     private ClientHandlerListener listener;
     private int retryAttempts = Constants.KEEPALIVE_RETRY_ATTEMPTS;
 
-    private PrintStream output;
-    private Scanner input;
+    private DataOutputStream output;
+    private DataInputStream input;
 
     public PlayerIndex index;
 
@@ -44,34 +49,21 @@ public class ClientHandler extends Thread {
     public void run() {
         assert socket != null;
         try {
-            output = new PrintStream(socket.getOutputStream());
-            input = new Scanner(socket.getInputStream());
+            output = new DataOutputStream(socket.getOutputStream());
+            input = new DataInputStream(socket.getInputStream());
             socket.setSoTimeout(Constants.KEEPALIVE_DELAY);
             send(new HandshakeMessage(index));
 
             while (true) {
                 try {
-                    int timeSpent = 0;
-                    while(timeSpent <= socket.getSoTimeout()) {
-                        if(input.hasNextLine()) break;
-                        Thread.sleep(100);
-                        timeSpent += 100;
-                    }
-                    if (!input.hasNextLine()) throw new Exception("no message received");
-                    String message = ThrowableUtils.nullIfThrows(() -> input.nextLine());
-                    if (!message.startsWith("@")) throw new Exception("message didn't start with \"@\"");
-
-                    String className = message.substring(1);
-                    String data = input.nextLine();
-                    XmlUtils.XmlResult parseResult = XmlUtils.unmarshal(className, data);
-                    if (!parseResult.success()) throw new Exception(parseResult.error());
-
-                    boolean shouldDisconnect = handleMessage((ActionMessage) parseResult.data());
+                    ActionMessage message = ThrowableUtils.nullIfThrows(this::tryReceiveMessage);
+                    if (message == null) throw new Exception("no message received");
+                    boolean shouldDisconnect = handleMessage(message);
                     if (shouldDisconnect) break;
                 } catch (Exception e) {
                     System.out.println("pinging [" + (index.ordinal() + 1) + "]: " + e.getMessage());
                     try {
-                        send(new ActionMessage("ping"));
+                        send(new ActionMessage("ping", UUID.randomUUID().toString()));
                         retryAttempts--;
                         socket.setSoTimeout(Constants.KEEPALIVE_DELAY * (Constants.KEEPALIVE_RETRY_ATTEMPTS - retryAttempts));
                         if (retryAttempts < Constants.KEEPALIVE_RETRY_ATTEMPTS - 1)
@@ -89,6 +81,53 @@ public class ClientHandler extends Thread {
         }
     }
 
+    private ActionMessage tryReceiveMessage() throws IOException {
+        int classNameLength = input.readInt();
+        byte[] classNameBytes = new byte[classNameLength];
+        input.readFully(classNameBytes, 0, classNameLength);
+        String className = new String(classNameBytes, StandardCharsets.UTF_8);
+
+        int payloadLength = input.readInt();
+        byte[] payloadBytes = new byte[payloadLength];
+        input.readFully(payloadBytes, 0, payloadLength);
+        String payload = new String(payloadBytes, StandardCharsets.UTF_8);
+
+        System.out.printf("\t<< payloadLength: %d | className: %s\n", payloadLength, className);
+        if (!className.contains("IntroductionSubmitProgressResultMessage") && !className.contains("IntroductionUpdateOpponentMessage"))
+            System.out.println("\t" + payload);
+        else System.out.println("\t<< not outputting introduction payload (too long) >:(");
+
+        XmlUtils.XmlResult parseResult = XmlUtils.unmarshal(className, payload);
+        if (!parseResult.success()) {
+            System.err.println(payload);
+            System.err.println(parseResult.error());
+            return null;
+        }
+        return (ActionMessage) parseResult.data();
+    }
+
+    private void tryWriteMessage(ActionMessage message) throws IOException {
+        XmlUtils.XmlResult result = XmlUtils.marshal(message);
+        if (!result.success()) {
+            System.err.println(message);
+            System.err.println(result.error());
+            return;
+        }
+
+        String className = message.getClass().getName();
+        String payload = (String) result.data();
+
+        System.out.printf("\t>> payloadLength: %d | className: %s\n", payload.length(), className);
+        if (!className.contains("IntroductionUpdateOpponentMessage")) System.out.println("\t" + payload);
+        else System.out.println("\t>> not outputting introduction payload (too long) >:(");
+
+        output.writeInt(className.length());
+        output.writeBytes(className);
+        output.writeInt(payload.length());
+        output.writeBytes(payload);
+        output.flush();
+    }
+
     private void printMessage(ActionMessage message, boolean fromServer) {
         String prefix = "[" + (fromServer ? "server" : index.ordinal() + 1) + " -> " + (fromServer ? index
                 .ordinal() + 1 : "server") + "]";
@@ -97,14 +136,7 @@ public class ClientHandler extends Thread {
 
     public void send(ActionMessage message) throws IOException {
         printMessage(message, true);
-        XmlUtils.XmlResult result = XmlUtils.marshal(message);
-        if (!result.success()) {
-            System.err.println(message);
-            System.err.println(result.error());
-            return;
-        }
-        output.println("@" + message.getClass().getName());
-        output.println((String) result.data());
+        tryWriteMessage(message);
     }
 
     private boolean handleMessage(ActionMessage message) {
@@ -120,6 +152,10 @@ public class ClientHandler extends Thread {
                     socket.setSoTimeout(Constants.KEEPALIVE_DELAY);
                 } catch (SocketException ignored) {
                 }
+                return false;
+            }
+            case "handshake_result": {
+                listener.onConnectionEstablished();
                 return false;
             }
             case "introduction_submit_progress_result": {

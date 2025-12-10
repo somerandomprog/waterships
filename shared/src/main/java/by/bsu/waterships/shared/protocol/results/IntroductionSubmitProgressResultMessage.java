@@ -13,7 +13,7 @@ public class IntroductionSubmitProgressResultMessage extends ActionResultMessage
     public PlayerInfo info;
 
     public IntroductionSubmitProgressResultMessage() {
-        super("introductionsubmit_progress_result", null);
+        super("introduction_submit_progress_result", null);
     }
 
     public IntroductionSubmitProgressResultMessage(String correlationId, PlayerInfo info) {

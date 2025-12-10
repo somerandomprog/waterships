@@ -78,8 +78,8 @@ public class IntroduceController extends SceneController.WatershipsScene {
         Resources.SFX.PAPER_SFX.play();
 
         listener = message -> {
-            if (message.getAction() == "introduction_submit_progress") {
-                Platform.runLater(() -> {
+            switch (message.getAction()) {
+                case "introduction_submit_progress" -> Platform.runLater(() -> {
                     try {
                         SnapshotParameters sp = new SnapshotParameters();
                         sp.setFill(Color.TRANSPARENT);
@@ -87,30 +87,32 @@ public class IntroduceController extends SceneController.WatershipsScene {
                         RenderedImage rimage = SwingFXUtils.fromFXImage(wimage, null);
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         ImageIO.write(rimage, "png", baos);
-                        Client.getInstance().sendMessageWithoutResponse(
+                        new Thread(() -> Client.getInstance().sendMessageWithoutResponse(
                                 new IntroductionSubmitProgressResultMessage(
                                         message.getCorrelationId(),
                                         new PlayerInfo(baos.toByteArray(), nameField.getText())
                                 )
-                        );
+                        )).start();
                         _lastRenderedImage = wimage;
                     } catch (Exception ignored) {
 
                     }
                 });
-            } else if (message.getAction().equals("introduction_update_opponent")) {
-                IntroductionUpdateOpponentMessage uoim = (IntroductionUpdateOpponentMessage) message;
-                Platform.runLater(() -> {
-                    opponentImageView.setImage(new Image(new ByteArrayInputStream((uoim.getInfo().image))));
-                    opponentName.setText(uoim.getInfo().name);
-                });
-            } else if (Objects.equals(message.getAction(), "introduction_end")) {
-                GameState state = GameState.getInstance();
-                state.meName = nameField.getText();
-                state.meImage = _lastRenderedImage;
-                state.opponentName = opponentName.getText();
-                state.opponentImage = opponentImageView.getImage();
-                Platform.runLater(() -> SceneController.getInstance().activate(SceneController.ASSEMBLE_BOARD_SCENE));
+                case "introduction_update_opponent" -> {
+                    IntroductionUpdateOpponentMessage uoim = (IntroductionUpdateOpponentMessage) message;
+                    Platform.runLater(() -> {
+                        opponentImageView.setImage(new Image(new ByteArrayInputStream((uoim.getInfo().image))));
+                        opponentName.setText(uoim.getInfo().name);
+                    });
+                }
+                case "introduction_end" -> {
+                    GameState state = GameState.getInstance();
+                    state.meName = nameField.getText();
+                    state.meImage = _lastRenderedImage;
+                    state.opponentName = opponentName.getText();
+                    state.opponentImage = opponentImageView.getImage();
+                    Platform.runLater(() -> SceneController.getInstance().activate(SceneController.ASSEMBLE_BOARD_SCENE));
+                }
             }
         };
         Client.getInstance().addCommandListener(listener);

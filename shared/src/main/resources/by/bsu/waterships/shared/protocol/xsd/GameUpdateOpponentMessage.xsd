@@ -8,12 +8,8 @@
 
     <xs:complexType name="ShipType">
         <xs:sequence>
-            <xs:element name="index" type="xs:int"/>
-            <xs:element name="length" type="xs:int"/>
             <xs:element name="start" type="PointType"/>
-            <xs:element name="vertical" type="xs:boolean"/>
-            <xs:element name="destroyed" type="xs:boolean"/>
-            <xs:element name="Points" minOccurs="0">
+            <xs:element name="points" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="ShipPoint" type="PointType" minOccurs="0" maxOccurs="unbounded"/>
@@ -21,6 +17,11 @@
                 </xs:complexType>
             </xs:element>
         </xs:sequence>
+
+        <xs:attribute name="index" type="xs:int" use="required"/>
+        <xs:attribute name="length" type="xs:int" use="required"/>
+        <xs:attribute name="vertical" type="xs:boolean" use="required"/>
+        <xs:attribute name="destroyed" type="xs:boolean" use="required"/>
     </xs:complexType>
 
     <xs:complexType name="AttackResultType">
@@ -44,7 +45,7 @@
                 <xs:element name="result" type="AttackResultType"/>
             </xs:sequence>
             <xs:attribute name="action" type="xs:string" use="required"/>
-            <xs:attribute name="correlationId" type="xs:string" use="required"/>
+            <xs:attribute name="correlationId" type="xs:string"/>
         </xs:complexType>
     </xs:element>
 

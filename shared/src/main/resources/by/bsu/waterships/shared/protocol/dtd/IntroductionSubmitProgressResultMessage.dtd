@@ -2,8 +2,8 @@
         <!ELEMENT name (#PCDATA)>
         <!ELEMENT PlayerInfo (image, name)>
 
-        <!ELEMENT IntroductionSubmitProgressMessageResult (PlayerInfo)>
-        <!ATTLIST IntroductionSubmitProgressMessageResult
+        <!ELEMENT IntroductionSubmitProgressResultMessage (PlayerInfo)>
+        <!ATTLIST IntroductionSubmitProgressResultMessage
                 action CDATA #REQUIRED
                 correlationId CDATA #REQUIRED
                 >

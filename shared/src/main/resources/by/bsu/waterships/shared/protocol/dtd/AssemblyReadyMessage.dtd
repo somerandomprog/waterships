@@ -10,17 +10,19 @@
                 y CDATA #REQUIRED
                 >
 
-        <!ELEMENT Ship (index, length, start, vertical, destroyed, Points)>
-        <!ELEMENT index (#PCDATA)>
-        <!ELEMENT length (#PCDATA)>
+        <!ELEMENT Ship (start, points)>
+        <!ATTLIST Ship
+                index CDATA #REQUIRED
+                length CDATA #REQUIRED
+                vertical CDATA #REQUIRED
+                destroyed CDATA #REQUIRED
+                >
         <!ELEMENT start EMPTY>
         <!ATTLIST start
                 x CDATA #REQUIRED
                 y CDATA #REQUIRED
                 >
-        <!ELEMENT vertical (#PCDATA)>
-        <!ELEMENT destroyed (#PCDATA)>
-        <!ELEMENT Points (ShipPoint*)>
+        <!ELEMENT points (ShipPoint*)>
 
         <!ELEMENT Ships (Ship*)>
         <!ELEMENT Destroyed (Point*)>

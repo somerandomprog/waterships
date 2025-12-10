@@ -14,11 +14,11 @@ public class GameUpdateOpponentMessage extends ActionMessage {
     public Board.AttackResult result;
 
     public GameUpdateOpponentMessage() {
-        super("game_attack_result");
+        super("game_update_opponent");
     }
 
     public GameUpdateOpponentMessage(Board.AttackResult result) {
-        super("game_attack_result");
+        super("game_update_opponent");
         this.result = result;
     }
 }

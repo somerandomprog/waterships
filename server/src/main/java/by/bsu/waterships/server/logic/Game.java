@@ -10,6 +10,7 @@ import by.bsu.waterships.shared.protocol.results.GameAttackResultMessage;
 import by.bsu.waterships.shared.types.*;
 
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Game {
@@ -36,7 +37,7 @@ public class Game {
                             if (total >= Constants.INTRODUCTION_DURATION_SECONDS * 1000) {
                                 Server.getInstance().broadcast(new ActionMessage("introduction_end"));
                                 setState(GameState.ASSEMBLE_BOARD);
-                            } else Server.getInstance().broadcast(new ActionMessage("introduction_submit_progress"));
+                            } else Server.getInstance().broadcast(new ActionMessage("introduction_submit_progress", UUID.randomUUID().toString()));
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
@@ -85,7 +86,7 @@ public class Game {
         Board.AttackResult result = opponentBoard.attack(point);
 
         try {
-            Server.getInstance().getSocket(attacker).send(new GameAttackResultMessage(attackerMessage.getCorrelationId(), result));
+            Server.getInstance().getSocket(attacker).send(new GameAttackResultMessage(result, attackerMessage.getCorrelationId()));
             Server.getInstance().getSocket(opponent).send(new GameUpdateOpponentMessage(result));
             if (result.missed) switchTurn(opponent);
         } catch (IOException e) {

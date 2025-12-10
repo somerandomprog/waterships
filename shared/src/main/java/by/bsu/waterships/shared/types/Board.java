@@ -56,7 +56,6 @@ public class Board implements Serializable {
     public Board() {
     }
 
-    @XmlTransient
     public void addShip(Ship ship) {
         ships.add(ship);
     }
@@ -93,7 +92,6 @@ public class Board implements Serializable {
         return sb.toString().trim();
     }
 
-    @XmlTransient
     public AttackResult attack(Point point) {
         Ship ship = ships
                 .stream()
@@ -118,7 +116,6 @@ public class Board implements Serializable {
         return new AttackResult(point, false, ship, idle);
     }
 
-    @XmlTransient
     public boolean allShipsDestroyed() {
         return ships.stream().allMatch(ship -> ship.destroyed);
     }

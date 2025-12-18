@@ -20,12 +20,4 @@ public class IntroductionSubmitProgressResultMessage extends ActionResultMessage
         super("introduction_submit_progress_result", correlationId);
         this.info = info;
     }
-
-    public PlayerInfo getInfo() {
-        return info;
-    }
-
-    public void setInfo(PlayerInfo info) {
-        this.info = info;
-    }
 }

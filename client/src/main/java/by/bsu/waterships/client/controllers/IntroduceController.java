@@ -101,8 +101,8 @@ public class IntroduceController extends SceneController.WatershipsScene {
                 case "introduction_update_opponent" -> {
                     IntroductionUpdateOpponentMessage uoim = (IntroductionUpdateOpponentMessage) message;
                     Platform.runLater(() -> {
-                        opponentImageView.setImage(new Image(new ByteArrayInputStream((uoim.getInfo().image))));
-                        opponentName.setText(uoim.getInfo().name);
+                        opponentImageView.setImage(new Image(new ByteArrayInputStream((uoim.info.image))));
+                        opponentName.setText(uoim.info.name);
                     });
                 }
                 case "introduction_end" -> {

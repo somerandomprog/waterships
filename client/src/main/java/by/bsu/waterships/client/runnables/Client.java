@@ -53,7 +53,7 @@ public class Client extends Thread {
             if (message.getAction().equals("ping")) {
                 sendMessageWithoutResponse(new ActionResultMessage("ping_result", message.getCorrelationId()));
             } else if (message.getAction().equals("handshake")) {
-                GameState.getInstance().index = ((HandshakeMessage) message).getIndex();
+                GameState.getInstance().index = ((HandshakeMessage) message).index;
                 sendMessageWithoutResponse(new ActionMessage("handshake_result"));
                 connected = true;
                 if (listener != null) Platform.runLater(() -> listener.onConnect());

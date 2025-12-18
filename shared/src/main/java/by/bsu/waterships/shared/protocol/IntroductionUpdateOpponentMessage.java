@@ -10,7 +10,7 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(propOrder = {"info"})
 public class IntroductionUpdateOpponentMessage extends ActionMessage {
     @XmlElement(name = "PlayerInfo", required = true)
-    private PlayerInfo info;
+    public PlayerInfo info;
 
     public IntroductionUpdateOpponentMessage() {
         super("introduction_update_opponent");
@@ -18,14 +18,6 @@ public class IntroductionUpdateOpponentMessage extends ActionMessage {
 
     public IntroductionUpdateOpponentMessage(PlayerInfo info) {
         super("introduction_update_opponent");
-        this.info = info;
-    }
-
-    public PlayerInfo getInfo() {
-        return info;
-    }
-
-    public void setInfo(PlayerInfo info) {
         this.info = info;
     }
 }

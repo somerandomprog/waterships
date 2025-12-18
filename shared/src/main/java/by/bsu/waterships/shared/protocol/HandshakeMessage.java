@@ -9,7 +9,7 @@ import jakarta.xml.bind.annotation.*;
 @XmlType(propOrder = {"index"})
 public class HandshakeMessage extends ActionMessage {
     @XmlAttribute(required = true)
-    private PlayerIndex index;
+    public PlayerIndex index;
 
     public HandshakeMessage() {
         super("handshake");
@@ -17,14 +17,6 @@ public class HandshakeMessage extends ActionMessage {
 
     public HandshakeMessage(PlayerIndex index) {
         super("handshake");
-        this.index = index;
-    }
-
-    public PlayerIndex getIndex() {
-        return index;
-    }
-
-    public void setIndex(PlayerIndex index) {
         this.index = index;
     }
 }
